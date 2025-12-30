@@ -1,0 +1,47 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Resource {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  url         String
+  category    String
+  tags        String   // JSON array stored as string
+  featured    Boolean  @default(false)
+  approved    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([approved])
+  @@index([category])
+}
+
+model Submission {
+  id              String   @id @default(cuid())
+  title           String
+  description     String
+  url             String
+  category        String
+  tags            String   // JSON array stored as string
+  status          String   @default("pending") // pending, approved, rejected
+  featured        Boolean  @default(false)
+  submittedAt     DateTime @default(now())
+  submittedBy     String?
+  reviewedAt      DateTime?
+  reviewedBy      String?
+  rejectionReason String?
+
+  @@index([status])
+  @@index([category])
+}
+
