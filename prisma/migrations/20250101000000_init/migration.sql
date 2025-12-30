@@ -1,6 +1,6 @@
 -- CreateTable
 CREATE TABLE "Resource" (
-    "id" TEXT NOT NULL PRIMARY KEY,
+    "id" TEXT NOT NULL,
     "title" TEXT NOT NULL,
     "description" TEXT NOT NULL,
     "url" TEXT NOT NULL,
@@ -8,13 +8,15 @@ CREATE TABLE "Resource" (
     "tags" TEXT NOT NULL,
     "featured" BOOLEAN NOT NULL DEFAULT false,
     "approved" BOOLEAN NOT NULL DEFAULT true,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" DATETIME NOT NULL
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Resource_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "Submission" (
-    "id" TEXT NOT NULL PRIMARY KEY,
+    "id" TEXT NOT NULL,
     "title" TEXT NOT NULL,
     "description" TEXT NOT NULL,
     "url" TEXT NOT NULL,
@@ -22,11 +24,13 @@ CREATE TABLE "Submission" (
     "tags" TEXT NOT NULL,
     "status" TEXT NOT NULL DEFAULT 'pending',
     "featured" BOOLEAN NOT NULL DEFAULT false,
-    "submittedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "submittedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "submittedBy" TEXT,
-    "reviewedAt" DATETIME,
+    "reviewedAt" TIMESTAMP(3),
     "reviewedBy" TEXT,
-    "rejectionReason" TEXT
+    "rejectionReason" TEXT,
+
+    CONSTRAINT "Submission_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
@@ -40,3 +44,4 @@ CREATE INDEX "Submission_status_idx" ON "Submission"("status");
 
 -- CreateIndex
 CREATE INDEX "Submission_category_idx" ON "Submission"("category");
+
