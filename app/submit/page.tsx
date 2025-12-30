@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import SubmissionForm from '@/components/SubmissionForm'
 
 export default function SubmitPage() {
@@ -12,6 +13,13 @@ export default function SubmitPage() {
       
       <header className="bg-cyber-dark border-b border-cyber-cyan/40 cyber-border relative z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <Link 
+            href="/"
+            className="inline-flex items-center gap-2 text-cyber-cyan hover:text-cyber-cyan/80 font-mono mb-4 transition-colors group"
+          >
+            <span className="group-hover:-translate-x-1 transition-transform">&lt;</span>
+            <span>Back to Resources</span>
+          </Link>
           <h1 className="text-5xl font-bold neon-cyan mb-2 font-mono uppercase tracking-wider glitch-text" data-text="Submit a Resource">
             Submit a Resource
           </h1>
