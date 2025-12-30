@@ -68,6 +68,12 @@ export default function Home() {
             </div>
             <div className="flex gap-4">
               <Link
+                href="/manifesto"
+                className="px-4 py-2 bg-cyber-dark border border-cyber-magenta/40 text-cyber-magenta rounded-sm hover:bg-cyber-magenta/10 hover:border-cyber-magenta/60 transition-all font-mono font-bold uppercase text-sm terminal-glow"
+              >
+                Manifesto
+              </Link>
+              <Link
                 href="/submit"
                 className="px-4 py-2 resistance-accent text-cyber-cyan rounded-sm hover:opacity-90 transition-all hover:scale-105 font-mono font-bold uppercase text-sm border border-cyber-cyan/60 terminal-glow"
               >
