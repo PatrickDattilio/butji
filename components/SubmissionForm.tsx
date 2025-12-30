@@ -209,7 +209,7 @@ export default function SubmissionForm() {
           disabled={isSubmitting}
           className="w-full px-6 py-3 resistance-accent text-cyber-cyan rounded-sm font-bold hover:opacity-90 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-cyber-cyan/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all font-mono uppercase border border-cyber-cyan/60 terminal-glow"
         >
-          {isSubmitting ? '&gt; Submitting...' : '&gt; Submit Resource'}
+          {isSubmitting ? '> Submitting...' : '> Submit Resource'}
         </button>
       </form>
     </div>

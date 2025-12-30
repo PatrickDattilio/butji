@@ -62,11 +62,78 @@ Railway is independent, developer-friendly, and not AI-focused. Perfect for host
    - Build command is already configured in `package.json`
    - First deployment will run migrations automatically
 
-7. **Add Custom Domain:**
-   - Go to Settings → Networking
-   - Add custom domain: `butji.com`
-   - Railway provides DNS instructions
-   - SSL certificate is automatic
+7. **Add Custom Domain & Configure DNS:**
+   
+   **In Railway:**
+   - Go to your service → Settings → Networking
+   - Click "Add Custom Domain"
+   - Enter your domain: `butji.com` (and optionally `www.butji.com`)
+   - Railway will provide you with a CNAME target (looks like: `xxxxx.railway.app`)
+   
+   **In Your DNS Provider (where you bought butji.com):**
+   
+   You have two options depending on what your DNS provider supports:
+   
+   **Option A: CNAME Record (Recommended)**
+   - Type: `CNAME`
+   - Name/Host: `@` (or root domain, or leave blank - depends on your DNS provider)
+   - Value/Target: The CNAME target Railway provided (e.g., `xxxxx.railway.app`)
+   - TTL: 3600 (or default)
+   
+   **Option B: A Record (If CNAME not supported for root domain)**
+   - Type: `A`
+   - Name/Host: `@` (root domain)
+   - Value/Target: Railway's IP address (Railway will show this in the domain settings)
+   - TTL: 3600
+   
+   **For www subdomain (optional):**
+   - Type: `CNAME`
+   - Name/Host: `www`
+   - Value/Target: Same CNAME target from Railway
+   - TTL: 3600
+   
+   **DNS Propagation:**
+   - Changes can take 5 minutes to 48 hours to propagate
+   - Usually takes 15-30 minutes
+   - You can check propagation status at: https://dnschecker.org
+   
+   **SSL Certificate:**
+   - Railway automatically provisions SSL certificates via Let's Encrypt
+   - Certificate is issued automatically once DNS is configured correctly
+   - No manual SSL setup required
+   
+   **Troubleshooting SSL Certificate Errors:**
+   
+   If you see `ERR_CERT_COMMON_NAME_INVALID` or similar SSL errors:
+   
+   1. **Verify DNS is pointing to Railway:**
+      - Check DNS propagation: https://dnschecker.org
+      - Make sure your domain resolves to Railway's servers
+      - Wait 15-30 minutes after DNS changes
+   
+   2. **Verify domain is added in Railway:**
+      - Go to Settings → Networking
+      - Confirm `butji.com` is listed and shows "Active" or "Provisioning"
+      - If it shows an error, check the error message
+   
+   3. **Use the correct URL:**
+      - Access `https://butji.com` (not the Railway preview URL)
+      - Make sure you're using `https://` not `http://`
+      - Don't access via `xxxxx.railway.app` - that will show certificate errors
+   
+   4. **Wait for certificate provisioning:**
+      - Railway needs DNS to be correct before issuing certificates
+      - Can take 5-15 minutes after DNS is correct
+      - Check Railway dashboard for certificate status
+   
+   5. **Clear browser cache:**
+      - SSL errors can be cached by browsers
+      - Try incognito/private mode
+      - Clear SSL state: Chrome → Settings → Privacy → Clear browsing data → Cached images and files
+   
+   6. **Check Railway logs:**
+      - Look for SSL/certificate errors in Railway deployment logs
+      - Railway will show certificate provisioning status
 
 8. **Run Migrations (if needed):**
    ```bash
