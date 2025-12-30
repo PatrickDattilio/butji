@@ -38,14 +38,15 @@ Railway is independent, developer-friendly, and not AI-focused. Perfect for host
    - Railway automatically creates `DATABASE_URL` environment variable
 
 4. **Configure Environment Variables:**
-   - Go to your service → Variables
-   - Add:
-     ```
-     NEXTAUTH_SECRET=generate-with-openssl-rand-base64-32
-     NEXTAUTH_URL=https://butji.com
-     ADMIN_USERNAME=your-admin-username
-     ADMIN_PASSWORD=your-secure-password
-     ```
+   - Click on your service (the Next.js app, not the database)
+   - Go to the **Variables** tab
+   - Railway automatically adds `DATABASE_URL` when you add a PostgreSQL database (you don't need to set this manually)
+   - Click **+ New Variable** and add each of these:
+     - **NEXTAUTH_SECRET**: Generate with `openssl rand -base64 32` (or use Railway's "Generate" button)
+     - **NEXTAUTH_URL**: Your production URL (e.g., `https://butji.com` or Railway's preview URL initially)
+     - **ADMIN_USERNAME**: Your admin username for login
+     - **ADMIN_PASSWORD**: A strong password for admin access
+   - **Note**: After adding variables, Railway will automatically redeploy your service
 
 5. **Update Prisma Schema for PostgreSQL:**
    - Update `prisma/schema.prisma`:
