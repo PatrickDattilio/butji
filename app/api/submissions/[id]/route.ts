@@ -5,7 +5,7 @@ import { updateSubmission, deleteSubmission } from '@/lib/submissions'
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await getServerSession(authOptions)
   if (!session) {
@@ -14,7 +14,7 @@ export async function PATCH(
   try {
     const body = await request.json()
     const { action, rejectionReason, reviewedBy, edits } = body
-    const { id } = params
+    const { id } = await params
 
     if (!action || !['approve', 'reject', 'update'].includes(action)) {
       return NextResponse.json(
@@ -105,7 +105,7 @@ export async function PATCH(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await getServerSession(authOptions)
   if (!session) {
@@ -113,7 +113,7 @@ export async function DELETE(
   }
 
   try {
-    const { id } = params
+    const { id } = await params
     const deleted = await deleteSubmission(id)
 
     if (!deleted) {
