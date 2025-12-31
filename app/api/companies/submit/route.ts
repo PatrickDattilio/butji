@@ -26,8 +26,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: true, id: submission.id }, { status: 201 })
   } catch (error) {
     console.error('Error creating company submission:', error)
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
     return NextResponse.json(
-      { error: 'Failed to submit company' },
+      { error: 'Failed to submit company', details: errorMessage },
       { status: 500 }
     )
   }
