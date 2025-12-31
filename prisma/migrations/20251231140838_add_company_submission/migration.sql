@@ -1,5 +1,5 @@
 -- CreateTable
-CREATE TABLE "CompanySubmission" (
+CREATE TABLE IF NOT EXISTS "CompanySubmission" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "description" TEXT NOT NULL,
@@ -25,4 +25,4 @@ CREATE TABLE "CompanySubmission" (
 );
 
 -- CreateIndex
-CREATE INDEX "CompanySubmission_status_idx" ON "CompanySubmission"("status");
+CREATE INDEX IF NOT EXISTS "CompanySubmission_status_idx" ON "CompanySubmission"("status");
