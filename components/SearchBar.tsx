@@ -3,9 +3,10 @@
 interface SearchBarProps {
   value: string
   onChange: (value: string) => void
+  placeholder?: string
 }
 
-export default function SearchBar({ value, onChange }: SearchBarProps) {
+export default function SearchBar({ value, onChange, placeholder = '&gt; Search resources...' }: SearchBarProps) {
   return (
     <div className="relative">
       <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
@@ -28,7 +29,7 @@ export default function SearchBar({ value, onChange }: SearchBarProps) {
         type="text"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        placeholder="&gt; Search resources..."
+        placeholder={placeholder}
         className="block w-full pl-10 pr-3 py-3 border border-cyber-cyan/40 rounded-sm bg-cyber-dark text-cyber-cyan placeholder-cyber-cyan/40 focus:outline-none focus:border-cyber-cyan/80 focus:ring-2 focus:ring-cyber-cyan/30 font-mono cyber-border terminal-glow"
       />
     </div>

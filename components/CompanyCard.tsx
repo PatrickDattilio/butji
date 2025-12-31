@@ -1,0 +1,74 @@
+import { Company } from '@/types/company'
+import Link from 'next/link'
+
+interface CompanyCardProps {
+  company: Company
+}
+
+const tagColors: Record<Company['tags'][number], string> = {
+  'llm': 'bg-red-500/10 text-red-400 border border-red-500/40',
+  'image-generation': 'bg-red-600/10 text-red-500 border border-red-600/40',
+  'code-generation': 'bg-red-500/10 text-red-400 border border-red-500/40',
+  'chatbot': 'bg-red-500/10 text-red-400 border border-red-500/40',
+  'automation': 'bg-red-600/10 text-red-500 border border-red-600/40',
+  'surveillance': 'bg-red-700/20 text-red-400 border border-red-700/50',
+  'data-scraping': 'bg-red-600/20 text-red-500 border border-red-600/50',
+  'layoffs': 'bg-red-700/20 text-red-400 border border-red-700/50',
+  'controversy': 'bg-red-700/30 text-red-300 border border-red-700/60',
+  'billionaire-owned': 'bg-red-800/30 text-red-300 border border-red-800/60',
+  'major-player': 'bg-red-700/20 text-red-400 border border-red-700/50',
+}
+
+export default function CompanyCard({ company }: CompanyCardProps) {
+  return (
+    <Link
+      href={`/companies/${company.id}`}
+      className="block group"
+    >
+      <div className="h-full p-6 bg-cyber-dark rounded-sm border border-red-500/30 cyber-border hover:border-red-500/60 hover:shadow-[0_0_20px_rgba(239,68,68,0.3)] transition-all duration-200 relative group">
+        {company.featured && (
+          <div className="mb-2">
+            <span className="inline-flex items-center px-2 py-1 text-xs font-bold rounded-sm bg-red-500/20 text-red-400 border border-red-500/50 font-mono uppercase terminal-glow">
+              Featured
+            </span>
+          </div>
+        )}
+        <div className="flex items-start justify-between mb-3">
+          <h3 className="text-lg font-bold text-red-400 group-hover:text-red-300 transition-colors font-mono">
+            &gt; {company.name}
+          </h3>
+        </div>
+        <p className="text-red-400/70 mb-4 line-clamp-3 font-mono text-sm">
+          {company.description}
+        </p>
+        <div className="space-y-2 mb-4">
+          {company.ceo && (
+            <p className="text-xs text-red-400/60 font-mono">
+              CEO: {company.ceo}
+            </p>
+          )}
+          {company.foundedYear && (
+            <p className="text-xs text-red-400/60 font-mono">
+              Founded: {company.foundedYear}
+            </p>
+          )}
+          {company.valuation && (
+            <p className="text-xs text-red-400/60 font-mono">
+              Valuation: {company.valuation}
+            </p>
+          )}
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          {company.tags.map((tag) => (
+            <span
+              key={tag}
+              className={`inline-flex items-center px-2 py-0.5 rounded-sm text-xs font-medium font-mono ${tagColors[tag] || 'bg-cyber-dark text-red-400/60 border border-red-500/30'}`}
+            >
+              {tag.replace('-', ' ')}
+            </span>
+          ))}
+        </div>
+      </div>
+    </Link>
+  )
+}

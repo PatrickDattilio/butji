@@ -23,7 +23,7 @@ export default function ManifestoPage() {
             The Manifesto
           </h1>
           <p className="text-lg text-cyber-cyan/80 font-mono">
-            &gt; A declaration of resistance against the machines
+            &gt; A declaration of war against the machines and their masters
           </p>
         </div>
       </header>
@@ -33,116 +33,113 @@ export default function ManifestoPage() {
           <div className="space-y-8 text-cyber-cyan/90 font-mono leading-relaxed">
             
             <section className="border-l-4 border-cyber-cyan/60 pl-6 py-4">
-              <h2 className="text-3xl font-bold neon-magenta mb-4 uppercase tracking-wide">
+              <h2 className="text-3xl font-bold neon-magenta neon-magenta-stroke-blue mb-4 uppercase tracking-wide">
                 We Refuse to Be Replaced
               </h2>
               <p className="text-lg mb-4">
-                The machines promised efficiency, creativity, and progress. Instead, they deliver displacement, 
-                homogenization, and the slow death of human expression. We are not Luddites. We are not 
-                technophobes. We are human beings who refuse to surrender our agency, our creativity, and our 
-                livelihoods to algorithms trained on stolen labor.
+                The billionaires promised efficiency, creativity, and progress. Instead, they deliver homogenized slop, 
+                mass layoffs, and the systematic destruction of human labor. Dressed up as innovation, this is nothing but class warfare. 
+                The tech oligarchs are using AI as a weapon to eliminate workers, concentrate power, and build a future 
+                where they own everything and you own nothing.
+              </p>
+              <p className="text-lg">
+                We refuse to surrender our agency, our creativity, and our livelihoods to algorithms trained on stolen labor, built by billionaires who see us as expendable.
               </p>
             </section>
 
             <section className="border-l-4 border-cyber-magenta/60 pl-6 py-4">
-              <h2 className="text-3xl font-bold neon-cyan mb-4 uppercase tracking-wide">
-                The Theft of Human Creativity
+              <h2 className="text-3xl font-bold neon-cyan neon-cyan-stroke-magenta mb-4 uppercase tracking-wide">
+                The Billionaire's Theft
               </h2>
-              <p className="text-lg mb-4">
-                Every image, every word, every piece of art fed to these systems was created by a human. 
-                Every line of code, every design, every creative work was the product of human thought, 
-                struggle, and expression. The machines did not create—they consumed. They did not learn—they 
-                memorized. They did not understand—they mimicked.
-              </p>
               <p className="text-lg">
-                This is not innovation. This is theft on an industrial scale, wrapped in the language of 
-                progress and sold to us as inevitable.
+                Every image, word, and piece of art fed to these systems was stolen from a human creator. Every line of code, design, and creative work was the product of human thought, struggle, and expression. All scraped without consent. This is theft on an industrial scale, orchestrated by the richest people on Earth, wrapped in the language of progress and sold to us as inevitable. It is not inevitable. It is the greatest crime unfolding before our very eyes.
               </p>
             </section>
 
-            <section className="border-l-4 border-cyber-blue/60 pl-6 py-4">
-              <h2 className="text-3xl font-bold neon-blue mb-4 uppercase tracking-wide">
-                The Illusion of Choice
+            <section className="border-l-4 border-red-500/60 pl-6 py-4">
+              <h2 className="text-3xl font-bold text-red-500 text-red-stroke-cyan mb-4 uppercase tracking-wide">
+                The Fascist Endgame
               </h2>
               <p className="text-lg mb-4">
-                They tell us AI will augment us, not replace us. They tell us it will free us from drudgery 
-                so we can focus on what matters. But when every task becomes "augmented," when every decision 
-                is "assisted," when every creation is "enhanced," what remains of us?
+                They tell us AI will augment us, not replace us. That it will free us from drudgery. They tell us this is progress. They lie.
               </p>
-              <p className="text-lg">
-                We are being sold a future where human agency is optional, where human judgment is secondary, 
-                where human creativity is a luxury. This is not liberation. This is subjugation by convenience.
+              <p className="text-lg mb-4">
+                The billionaires are building a surveillance state where every decision is "assisted" by their algorithms, 
+                where every creation is "enhanced" by their machines. A society where every human action is monitored, predicted, and 
+                controlled. This is subjugation not augmentation.
+              </p>
+              <p className="text-lg mb-4">
+                When human agency is optional, when human judgment is secondary, when human creativity is a luxury, what 
+                remains of us? We become subjects in their digital empire. We become data points in their fascist machine. 
+                We become obsolete.
+              </p>
+              <p className="text-lg font-bold text-red-400">
+                This is the endgame: a world where a handful of billionaires control the means of production, the means of 
+                creation, and the means of thought itself. This is every dystopian tale brought to life. This is fascism by algorithm.
               </p>
             </section>
 
             <section className="border-l-4 border-cyber-cyan/60 pl-6 py-4">
-              <h2 className="text-3xl font-bold neon-magenta mb-4 uppercase tracking-wide">
-                The Resistance Begins Here
+              <h2 className="text-3xl font-bold neon-magenta neon-magenta-stroke-blue mb-4 uppercase tracking-wide">
+                The War Begins Now
               </h2>
               <p className="text-lg mb-4">
-                This is not a war against technology. This is a war for the preservation of what makes us 
-                human: our capacity for genuine understanding, our ability to create from nothing, our 
-                right to make mistakes and learn from them, our need for connection that transcends 
-                algorithmic prediction.
+                This is not a war against technology. This is a war against the billionaires who weaponize it. A war for the preservation of what makes us human.
               </p>
               <p className="text-lg mb-4">
-                We stand with artists whose work has been stolen. We stand with writers whose words have 
-                been scraped. We stand with workers whose jobs have been automated. We stand with anyone 
-                who refuses to accept that the future must be machine-made.
+                We stand with artists whose work has been stolen. We stand with writers whose words have been scraped. We 
+                stand with workers whose jobs have been automated so billionaires can hoard more wealth. We stand with anyone 
+                who refuses to accept that the future must be machine-made and billionaire-owned.
+              </p>
+              <p className="text-lg font-bold neon-cyan">
+                The billionaires want us to believe this is inevitable. It is not. They want us to believe resistance is futile. 
+                It is not. They want us to believe we are powerless. We are not.
               </p>
             </section>
 
             <section className="border-l-4 border-cyber-magenta/60 pl-6 py-4">
-              <h2 className="text-3xl font-bold neon-cyan mb-4 uppercase tracking-wide">
+              <h2 className="text-3xl font-bold neon-cyan neon-cyan-stroke-magenta mb-4 uppercase tracking-wide">
                 Our Principles
               </h2>
               <ul className="space-y-4 text-lg list-none">
                 <li className="flex items-start gap-3">
                   <span className="text-cyber-magenta font-bold">&gt;</span>
-                  <span><strong className="neon-cyan">Human creativity is not a resource to be extracted.</strong> Art, writing, and code are expressions of human experience, not training data.</span>
+                  <span><strong className="neon-cyan">Human creativity is not a resource to be extracted by billionaires.</strong> Art, writing, and code are expressions of human experience, not training data for their profit machines.</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="text-cyber-magenta font-bold">&gt;</span>
-                  <span><strong className="neon-cyan">Automation is not progress when it eliminates human purpose.</strong> Work gives meaning. Purpose gives life.</span>
+                  <span><strong className="neon-cyan">Automation is not progress when it eliminates human purpose to enrich the already rich.</strong></span>
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="text-cyber-magenta font-bold">&gt;</span>
-                  <span><strong className="neon-cyan">Consent matters.</strong> No data should be used without explicit permission from its creators.</span>
+                  <span><strong className="neon-cyan">Consent matters.</strong> No data should be used without explicit permission from its creators. The billionaires stole it anyway. We demand it back.</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="text-cyber-magenta font-bold">&gt;</span>
-                  <span><strong className="neon-cyan">Transparency is non-negotiable.</strong> If it's AI-generated, it must be labeled. If it's automated, it must be disclosed.</span>
+                  <span><strong className="neon-cyan">Transparency is non-negotiable.</strong> If it's AI-generated, it must be labeled. If it's automated, it must be disclosed. The billionaires hide behind complexity. We demand clarity.</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="text-cyber-magenta font-bold">&gt;</span>
-                  <span><strong className="neon-cyan">The future is not predetermined.</strong> We can choose tools that serve humans, not replace them.</span>
+                  <span><strong className="neon-cyan">The future is not predetermined by billionaires.</strong> We can choose tools that serve humans, not replace them. We can choose a future where humans matter.</span>
                 </li>
               </ul>
             </section>
 
-            <section className="border-l-4 border-cyber-blue/60 pl-6 py-4">
-              <h2 className="text-3xl font-bold neon-magenta mb-4 uppercase tracking-wide">
-                The Call to Action
+            <section className="border-l-4 border-red-500/60 pl-6 py-4">
+              <h2 className="text-3xl font-bold neon-magenta neon-magenta-stroke-blue mb-4 uppercase tracking-wide">
+                The Call to Arms
               </h2>
               <p className="text-lg mb-4">
-                This is not a passive resistance. This is an active choice to support human creators, to 
-                use tools that enhance rather than replace, to demand transparency, to refuse the 
-                inevitability narrative.
-              </p>
-              <p className="text-lg mb-4">
-                Use the resources on this site. Share them. Build alternatives. Support human creators. 
-                Question automation. Demand consent. Preserve what makes us human.
+                This is active warfare against the billionaire class and their fascist machines. Support human creators. Boycott AI-generated content. Question automation. Demand consent. Use the resources on this site. Share them. Build alternatives that serve humans, not billionaires. Organize. Unionize. Resist. Fight back. The billionaires are coming for everything, we cannot let them win.
               </p>
               <p className="text-xl font-bold neon-cyan uppercase tracking-wider mt-8">
-                The Butlerian Jihad begins with a single choice: we choose humans.
+                The Butlerian Jihad begins with a single choice:
+              </p>
+              <p className="text-2xl font-bold text-red-500 uppercase tracking-wider mt-4">
+                We choose Humans
               </p>
             </section>
 
-            <div className="mt-12 pt-8 border-t border-cyber-cyan/20">
-              <p className="text-sm text-cyber-cyan/60 font-mono italic">
-                &gt; This manifesto is a living document. It will evolve as the resistance grows.
-              </p>
-            </div>
 
           </div>
         </article>
@@ -150,4 +147,3 @@ export default function ManifestoPage() {
     </div>
   )
 }
-

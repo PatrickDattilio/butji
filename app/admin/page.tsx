@@ -262,12 +262,20 @@ export default function AdminPage() {
                 &gt; Review and manage resource submissions
               </p>
             </div>
-            <Link
-              href="/"
-              className="px-4 py-2 text-cyber-cyan hover:text-cyber-magenta transition-colors font-mono uppercase text-sm border border-cyber-cyan/40 rounded-sm hover:border-cyber-cyan/80 terminal-glow"
-            >
-              ← Back to Home
-            </Link>
+            <div className="flex gap-4">
+              <Link
+                href="/admin/companies"
+                className="px-4 py-2 text-cyber-cyan hover:text-cyber-magenta transition-colors font-mono uppercase text-sm border border-cyber-cyan/40 rounded-sm hover:border-cyber-cyan/80 terminal-glow"
+              >
+                Manage Companies
+              </Link>
+              <Link
+                href="/"
+                className="px-4 py-2 text-cyber-cyan hover:text-cyber-magenta transition-colors font-mono uppercase text-sm border border-cyber-cyan/40 rounded-sm hover:border-cyber-cyan/80 terminal-glow"
+              >
+                ← Back to Home
+              </Link>
+            </div>
           </div>
         </div>
       </header>

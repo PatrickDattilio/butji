@@ -192,6 +192,22 @@ body::before {
       0 0 15px #0080ff;
   }
   
+  /* Text stroke for opposite color borders on H2 titles */
+  .neon-magenta-stroke-blue {
+    -webkit-text-stroke: 1px #0080ff;
+    text-stroke: 1px #0080ff;
+  }
+  
+  .neon-cyan-stroke-magenta {
+    -webkit-text-stroke: 1px #ff00ff;
+    text-stroke: 1px #ff00ff;
+  }
+  
+  .text-red-stroke-cyan {
+    -webkit-text-stroke: 1px #00ffff;
+    text-stroke: 1px #00ffff;
+  }
+  
   .terminal-glow {
     box-shadow: 
       0 0 5px rgba(0, 255, 255, 0.5),

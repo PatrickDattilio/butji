@@ -45,4 +45,52 @@ model Submission {
   @@index([category])
 }
 
+model Company {
+  id            String   @id @default(cuid())
+  name          String
+  description   String   @db.Text
+  website       String?
+  founders      String   // JSON array stored as string
+  ceo           String?
+  foundedYear   Int?
+  funding       String?  // JSON object or string
+  valuation     String?
+  products      String   // JSON array stored as string
+  controversies String?  @db.Text
+  layoffs       String?  // JSON array stored as string
+  tags          String   // JSON array stored as string
+  featured      Boolean  @default(false)
+  approved      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([approved])
+  @@index([name])
+}
+
+model CompanySubmission {
+  id              String   @id @default(cuid())
+  name            String
+  description     String   @db.Text
+  website         String?
+  founders        String   // JSON array stored as string
+  ceo             String?
+  foundedYear     Int?
+  funding         String?  // JSON object or string
+  valuation       String?
+  products        String   // JSON array stored as string
+  controversies   String?  @db.Text
+  layoffs         String?  // JSON array stored as string
+  tags            String   // JSON array stored as string
+  status          String   @default("pending") // pending, approved, rejected
+  featured        Boolean  @default(false)
+  submittedAt     DateTime @default(now())
+  submittedBy     String?
+  reviewedAt      DateTime?
+  reviewedBy      String?
+  rejectionReason String?
+
+  @@index([status])
+}
+
 

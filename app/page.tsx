@@ -74,6 +74,12 @@ export default function Home() {
                 Manifesto
               </Link>
               <Link
+                href="/companies"
+                className="px-4 py-2 bg-cyber-dark border border-red-500/40 text-red-400 rounded-sm hover:bg-red-500/10 hover:border-red-500/60 transition-all font-mono font-bold uppercase text-sm terminal-glow"
+              >
+                Companies
+              </Link>
+              <Link
                 href="/submit"
                 className="px-4 py-2 resistance-accent text-cyber-cyan rounded-sm hover:opacity-90 transition-all hover:scale-105 font-mono font-bold uppercase text-sm border border-cyber-cyan/60 terminal-glow"
               >
