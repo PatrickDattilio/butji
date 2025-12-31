@@ -27,7 +27,10 @@ export default function AdminCompaniesPage() {
   const [loading, setLoading] = useState(true)
   const [showAddForm, setShowAddForm] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
-  const [formData, setFormData] = useState<Partial<Company>>({
+  const [formData, setFormData] = useState<Partial<Company> & {
+    founders?: string[] | string
+    products?: string[] | string
+  }>({
     name: '',
     description: '',
     website: '',
@@ -101,17 +104,19 @@ export default function AdminCompaniesPage() {
       const url = editingId ? `/api/companies/${editingId}` : '/api/companies'
       const method = editingId ? 'PATCH' : 'POST'
 
-      const foundersArray = Array.isArray(formData.founders) 
-        ? formData.founders 
-        : typeof formData.founders === 'string' 
-          ? formData.founders.split(',').map(f => f.trim()).filter(Boolean)
-          : []
+      // Helper to convert founders/products to array
+      const getArrayFromValue = (value: string[] | string | undefined): string[] => {
+        if (Array.isArray(value)) {
+          return value
+        }
+        if (typeof value === 'string') {
+          return value.split(',').map(v => v.trim()).filter(Boolean)
+        }
+        return []
+      }
       
-      const productsArray = Array.isArray(formData.products)
-        ? formData.products
-        : typeof formData.products === 'string'
-          ? formData.products.split(',').map(p => p.trim()).filter(Boolean)
-          : []
+      const foundersArray = getArrayFromValue(formData.founders)
+      const productsArray = getArrayFromValue(formData.products)
 
       const response = await fetch(url, {
         method,
