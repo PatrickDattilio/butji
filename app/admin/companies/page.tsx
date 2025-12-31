@@ -101,13 +101,25 @@ export default function AdminCompaniesPage() {
       const url = editingId ? `/api/companies/${editingId}` : '/api/companies'
       const method = editingId ? 'PATCH' : 'POST'
 
+      const foundersArray = Array.isArray(formData.founders) 
+        ? formData.founders 
+        : typeof formData.founders === 'string' 
+          ? formData.founders.split(',').map(f => f.trim()).filter(Boolean)
+          : []
+      
+      const productsArray = Array.isArray(formData.products)
+        ? formData.products
+        : typeof formData.products === 'string'
+          ? formData.products.split(',').map(p => p.trim()).filter(Boolean)
+          : []
+
       const response = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...formData,
-          founders: Array.isArray(formData.founders) ? formData.founders : (formData.founders as string)?.split(',').map(f => f.trim()).filter(Boolean) || [],
-          products: Array.isArray(formData.products) ? formData.products : (formData.products as string)?.split(',').map(p => p.trim()).filter(Boolean) || [],
+          founders: foundersArray,
+          products: productsArray,
         }),
       })
 
