@@ -6,6 +6,9 @@ import { generateCollectionPageSchema, generateBreadcrumbSchema, renderStructure
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXTAUTH_URL || 'https://butji.com'
 
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 export const metadata: Metadata = {
   title: 'AI Company Database - Butji.com | Tracking the Machines',
   description: 'Track AI companies, their billionaires, controversies, and layoffs. Know your enemy. A comprehensive database of AI companies and their impact on workers.',

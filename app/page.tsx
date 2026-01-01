@@ -8,6 +8,9 @@ import { generateCollectionPageSchema, renderStructuredData } from '@/lib/seo'
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXTAUTH_URL || 'https://butji.com'
 
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 export const metadata: Metadata = {
   title: 'Butji - Anti-AI Tools & Resources | Butlerian Jihad',
   description: 'A curated collection of anti-AI tools, websites, and resources to help organize the effort against the machines. Discover privacy-focused tools, anti-AI resources, and join the Butlerian Jihad.',
