@@ -33,7 +33,7 @@ export default function ResourceCard({ resource }: ResourceCardProps) {
       rel="noopener noreferrer"
       className="block group"
     >
-      <div className="h-full p-6 bg-cyber-dark rounded-sm border border-cyber-cyan/30 cyber-border hover:border-cyber-cyan/60 hover:shadow-[0_0_20px_rgba(0,255,255,0.3)] transition-all duration-200 relative group">
+      <div className="h-full p-4 md:p-6 bg-cyber-dark rounded-sm border border-cyber-cyan/30 cyber-border hover:border-cyber-cyan/60 hover:shadow-[0_0_20px_rgba(0,255,255,0.3)] transition-all duration-200 relative group">
         {resource.featured && (
           <div className="mb-2">
             <span className="inline-flex items-center px-2 py-1 text-xs font-bold rounded-sm bg-cyber-cyan/20 text-cyber-cyan border border-cyber-cyan/50 font-mono uppercase terminal-glow">

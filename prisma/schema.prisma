@@ -93,4 +93,36 @@ model CompanySubmission {
   @@index([status])
 }
 
+model NewsSource {
+  id          String   @id @default(cuid())
+  name        String
+  url         String   // RSS feed URL or API endpoint
+  type        String   @default("rss") // rss, api
+  enabled     Boolean  @default(true)
+  lastFetched DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([enabled])
+}
+
+model NewsArticle {
+  id          String   @id @default(cuid())
+  title       String
+  description String?  @db.Text
+  url         String
+  source      String   // Source name
+  sourceUrl   String?  // Original source URL
+  imageUrl    String?
+  publishedAt DateTime
+  fetchedAt   DateTime @default(now())
+  tags        String?  // JSON array stored as string
+  featured    Boolean  @default(false)
+  approved    Boolean  @default(true)
+
+  @@index([publishedAt])
+  @@index([approved])
+  @@index([source])
+}
+
 

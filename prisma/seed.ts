@@ -9,6 +9,8 @@ async function main() {
   await prisma.resource.deleteMany()
   await prisma.submission.deleteMany()
   await prisma.company.deleteMany()
+  await prisma.newsArticle.deleteMany()
+  await prisma.newsSource.deleteMany()
 
  
   // Seed companies
@@ -143,6 +145,34 @@ async function main() {
   for (const company of companies) {
     await prisma.company.create({
       data: company,
+    })
+  }
+
+  // Seed news sources
+  const newsSources = [
+    {
+      name: 'TechCrunch AI',
+      url: 'https://techcrunch.com/tag/artificial-intelligence/feed/',
+      type: 'rss',
+      enabled: true,
+    },
+    {
+      name: 'The Verge AI',
+      url: 'https://www.theverge.com/ai-artificial-intelligence/rss/index.xml',
+      type: 'rss',
+      enabled: true,
+    },
+    {
+      name: 'Ars Technica AI',
+      url: 'https://feeds.arstechnica.com/arstechnica/index/category/artificial-intelligence',
+      type: 'rss',
+      enabled: true,
+    },
+  ]
+
+  for (const source of newsSources) {
+    await prisma.newsSource.create({
+      data: source,
     })
   }
 

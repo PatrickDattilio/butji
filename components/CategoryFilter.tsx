@@ -25,7 +25,7 @@ export default function CategoryFilter({ selected, onChange }: CategoryFilterPro
         <button
           key={category.value}
           onClick={() => onChange(category.value)}
-          className={`px-4 py-2 rounded-sm text-sm font-bold transition-all font-mono uppercase ${
+          className={`px-3 py-1.5 md:px-4 md:py-2 rounded-sm text-xs md:text-sm font-bold transition-all font-mono uppercase ${
             selected === category.value
               ? 'resistance-accent text-cyber-cyan border border-cyber-cyan/60 terminal-glow'
               : 'bg-cyber-dark text-cyber-cyan/60 border border-cyber-cyan/30 hover:border-cyber-cyan/60 hover:text-cyber-cyan cyber-border hover:terminal-glow'
