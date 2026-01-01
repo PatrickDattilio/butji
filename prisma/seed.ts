@@ -5,15 +5,7 @@ const prisma = new PrismaClient()
 async function main() {
   console.log('Seeding database...')
 
-  // Clear existing data
-  await prisma.resource.deleteMany()
-  await prisma.submission.deleteMany()
-  await prisma.company.deleteMany()
-  await prisma.newsArticle.deleteMany()
-  await prisma.newsSource.deleteMany()
-
- 
-  // Seed companies
+  // Seed companies (using upsert to avoid deleting existing data)
   const companies = [
     {
       name: 'OpenAI',
@@ -143,9 +135,19 @@ async function main() {
   ]
 
   for (const company of companies) {
-    await prisma.company.create({
-      data: company,
+    // Check if company already exists by name
+    const existing = await prisma.company.findFirst({
+      where: { name: company.name },
     })
+
+    if (!existing) {
+      await prisma.company.create({
+        data: company,
+      })
+      console.log(`Created company: ${company.name}`)
+    } else {
+      console.log(`Company already exists: ${company.name}`)
+    }
   }
 
   // Seed news sources
@@ -171,9 +173,75 @@ async function main() {
   ]
 
   for (const source of newsSources) {
-    await prisma.newsSource.create({
-      data: source,
+    // Check if news source already exists by URL
+    const existing = await prisma.newsSource.findFirst({
+      where: { url: source.url },
     })
+
+    if (!existing) {
+      await prisma.newsSource.create({
+        data: source,
+      })
+      console.log(`Created news source: ${source.name}`)
+    } else {
+      console.log(`News source already exists: ${source.name}`)
+    }
+  }
+
+  // Seed resources
+  const resources = [
+    {
+      title: 'Cara.app',
+      description: 'Portfolio platform for artists that actively blocks AI scrapers and protects creators\' work from unauthorized AI training.',
+      url: 'https://cara.app',
+      category: 'website',
+      tags: JSON.stringify(['protection', 'privacy']),
+      featured: true,
+      approved: true,
+    },
+    {
+      title: 'r/antiai',
+      description: 'Reddit community dedicated to discussing anti-AI efforts, sharing resources, and organizing resistance against unauthorized AI data scraping.',
+      url: 'https://reddit.com/r/antiai',
+      category: 'community',
+      tags: JSON.stringify(['advocacy', 'education']),
+      featured: false,
+      approved: true,
+    },
+    {
+      title: 'Butlerian Jihad',
+      description: 'A resource and community inspired by the Butlerian Jihad concept, organizing resistance against AI systems that threaten human creativity and labor.',
+      url: 'https://butlerianjihad.io',
+      category: 'website',
+      tags: JSON.stringify(['education', 'advocacy']),
+      featured: false,
+      approved: true,
+    },
+    {
+      title: 'Nightshade',
+      description: 'A tool from the University of Chicago that "poisons" images to disrupt AI training, helping artists protect their work from being used without consent.',
+      url: 'https://nightshade.cs.uchicago.edu/',
+      category: 'tool',
+      tags: JSON.stringify(['protection']),
+      featured: true,
+      approved: true,
+    },
+  ]
+
+  for (const resource of resources) {
+    // Check if resource already exists by URL
+    const existing = await prisma.resource.findFirst({
+      where: { url: resource.url },
+    })
+
+    if (!existing) {
+      await prisma.resource.create({
+        data: resource,
+      })
+      console.log(`Created resource: ${resource.title}`)
+    } else {
+      console.log(`Resource already exists: ${resource.title}`)
+    }
   }
 
   console.log('Database seeded successfully!')
