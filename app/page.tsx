@@ -5,6 +5,7 @@ import { Resource, ResourceCategory } from '@/types/resource'
 import ResourceCard from '@/components/ResourceCard'
 import SearchBar from '@/components/SearchBar'
 import CategoryFilter from '@/components/CategoryFilter'
+import DiscordButton from '@/components/DiscordButton'
 import Link from 'next/link'
 
 export default function Home() {
@@ -67,6 +68,7 @@ export default function Home() {
               </p>
             </div>
             <div className="flex gap-4">
+              <DiscordButton url="https://discord.gg/Kv9gJFMuJ" />
               <Link
                 href="/manifesto"
                 className="px-4 py-2 bg-cyber-dark border border-cyber-magenta/40 text-cyber-magenta rounded-sm hover:bg-cyber-magenta/10 hover:border-cyber-magenta/60 transition-all font-mono font-bold uppercase text-sm terminal-glow"
