@@ -43,6 +43,42 @@ export async function getApprovedResources(): Promise<Resource[]> {
   return all.filter((r) => r.approved !== false)
 }
 
+export async function getResourceById(id: string): Promise<Resource | null> {
+  try {
+    // Check database resources first
+    const dbResource = await prisma.resource.findUnique({
+      where: { id },
+    })
+
+    if (dbResource && dbResource.approved) {
+      return {
+        id: dbResource.id,
+        title: dbResource.title,
+        description: dbResource.description,
+        url: dbResource.url,
+        category: dbResource.category as Resource['category'],
+        tags: JSON.parse(dbResource.tags) as Resource['tags'],
+        featured: dbResource.featured,
+        approved: dbResource.approved,
+      }
+    }
+
+    // Check approved submissions
+    const submissions = await getSubmissions()
+    const submission = submissions.find((s) => s.id === id && s.status === 'approved')
+    
+    if (submission) {
+      const { status, reviewedAt, reviewedBy, rejectionReason, ...resource } = submission
+      return { ...resource, approved: true } as Resource
+    }
+
+    return null
+  } catch (error) {
+    console.error('Error fetching resource:', error)
+    return null
+  }
+}
+
 export async function createResource(resource: Omit<Resource, 'id'>): Promise<Resource> {
   const created = await prisma.resource.create({
     data: {

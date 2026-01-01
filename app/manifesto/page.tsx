@@ -1,8 +1,57 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
+import { generateArticleSchema, generateBreadcrumbSchema, renderStructuredData } from '@/lib/seo'
+
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXTAUTH_URL || 'https://butji.com'
+
+export const metadata: Metadata = {
+  title: 'The Manifesto - Butji.com | A Declaration Against the Machines',
+  description: 'A declaration of war against the machines and their masters. Read the Butlerian Jihad manifesto - our principles, our call to arms, and our refusal to be replaced.',
+  keywords: ['Butlerian Jihad', 'anti-AI manifesto', 'anti-automation', 'human creativity', 'AI resistance', 'workers rights'],
+  openGraph: {
+    title: 'The Manifesto - Butji.com',
+    description: 'A declaration of war against the machines and their masters.',
+    url: 'https://butji.com/manifesto',
+    siteName: 'Butji',
+    type: 'article',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'The Manifesto - Butji.com',
+    description: 'A declaration of war against the machines and their masters.',
+  },
+  alternates: {
+    canonical: 'https://butji.com/manifesto',
+  },
+}
 
 export default function ManifestoPage() {
+  const articleSchema = generateArticleSchema(
+    'The Manifesto - A Declaration Against the Machines',
+    `${baseUrl}/manifesto`,
+    'A declaration of war against the machines and their masters. Read the Butlerian Jihad manifesto.',
+    new Date().toISOString()
+  )
+  const breadcrumbSchema = generateBreadcrumbSchema([
+    { name: 'Home', url: baseUrl },
+    { name: 'Manifesto', url: `${baseUrl}/manifesto` },
+  ])
+
   return (
-    <div className="min-h-screen bg-cyber-darker relative">
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: renderStructuredData(articleSchema),
+        }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: renderStructuredData(breadcrumbSchema),
+        }}
+      />
+      <div className="min-h-screen bg-cyber-darker relative">
       {/* Scan line overlay */}
       <div className="fixed inset-0 pointer-events-none z-50 opacity-30">
         <div className="h-full w-full" style={{
@@ -145,5 +194,6 @@ export default function ManifestoPage() {
         </article>
       </main>
     </div>
+    </>
   )
 }

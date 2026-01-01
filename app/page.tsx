@@ -1,54 +1,51 @@
-'use client'
-
-import { useState, useMemo, useEffect } from 'react'
-import { Resource, ResourceCategory } from '@/types/resource'
-import ResourceCard from '@/components/ResourceCard'
-import SearchBar from '@/components/SearchBar'
-import CategoryFilter from '@/components/CategoryFilter'
+import type { Metadata } from 'next'
+import { getApprovedResources } from '@/lib/resources'
+import ResourceList from '@/components/ResourceList'
 import DiscordButton from '@/components/DiscordButton'
 import MobileNav from '@/components/MobileNav'
 import Link from 'next/link'
+import { generateCollectionPageSchema, renderStructuredData } from '@/lib/seo'
 
-export default function Home() {
-  const [searchQuery, setSearchQuery] = useState('')
-  const [selectedCategory, setSelectedCategory] = useState<ResourceCategory | 'all'>('all')
-  const [resources, setResources] = useState<Resource[]>([])
-  const [loading, setLoading] = useState(true)
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXTAUTH_URL || 'https://butji.com'
 
-  useEffect(() => {
-    fetchResources()
-  }, [])
+export const metadata: Metadata = {
+  title: 'Butji - Anti-AI Tools & Resources | Butlerian Jihad',
+  description: 'A curated collection of anti-AI tools, websites, and resources to help organize the effort against the machines. Discover privacy-focused tools, anti-AI resources, and join the Butlerian Jihad.',
+  keywords: ['anti-AI', 'Butlerian Jihad', 'anti-AI tools', 'privacy tools', 'AI resistance', 'human creativity', 'anti-automation'],
+  openGraph: {
+    title: 'Butji - Anti-AI Tools & Resources',
+    description: 'A curated collection of anti-AI tools, websites, and resources to help organize the effort against the machines.',
+    url: 'https://butji.com',
+    siteName: 'Butji',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Butji - Anti-AI Tools & Resources',
+    description: 'A curated collection of anti-AI tools, websites, and resources to help organize the effort against the machines.',
+  },
+  alternates: {
+    canonical: 'https://butji.com',
+  },
+}
 
-  const fetchResources = async () => {
-    try {
-      const response = await fetch('/api/resources')
-      const data = await response.json()
-      setResources(data)
-    } catch (error) {
-      console.error('Error fetching resources:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const filteredResources = useMemo(() => {
-    return resources.filter((resource: Resource) => {
-      const matchesSearch =
-        resource.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        resource.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        resource.tags.some((tag) => tag.toLowerCase().includes(searchQuery.toLowerCase()))
-
-      const matchesCategory = selectedCategory === 'all' || resource.category === selectedCategory
-
-      return matchesSearch && matchesCategory
-    })
-  }, [searchQuery, selectedCategory, resources])
-
-  const featuredResources = filteredResources.filter((r) => r.featured)
-  const regularResources = filteredResources.filter((r) => !r.featured)
+export default async function Home() {
+  const resources = await getApprovedResources()
+  const collectionSchema = generateCollectionPageSchema(
+    'Anti-AI Resources',
+    baseUrl,
+    'A curated collection of anti-AI tools, websites, and resources to help organize the effort against the machines.'
+  )
 
   return (
-    <div className="min-h-screen bg-cyber-darker relative">
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: renderStructuredData(collectionSchema),
+        }}
+      />
+      <div className="min-h-screen bg-cyber-darker relative">
       {/* Scan line overlay */}
       <div className="fixed inset-0 pointer-events-none z-50 opacity-30">
         <div className="h-full w-full" style={{
@@ -69,7 +66,7 @@ export default function Home() {
               </p>
             </div>
             {/* Desktop Navigation */}
-            <div className="hidden lg:flex gap-4">
+            <nav className="hidden lg:flex gap-4" aria-label="Main navigation">
               <DiscordButton url="https://discord.gg/Kv9gJFMuJ" />
               <Link
                 href="/manifesto"
@@ -101,7 +98,7 @@ export default function Home() {
               >
                 Admin
               </Link>
-            </div>
+            </nav>
             {/* Mobile Menu Button */}
             <div className="lg:hidden">
               <MobileNav />
@@ -112,68 +109,7 @@ export default function Home() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 md:py-8">
-        {loading ? (
-          <div className="text-center py-8 md:py-12">
-            <p className="text-cyber-cyan/60 font-mono">Loading resources...</p>
-          </div>
-        ) : (
-          <>
-            {/* Search and Filters */}
-            <div className="mb-6 md:mb-8 space-y-3 md:space-y-4">
-              <SearchBar value={searchQuery} onChange={setSearchQuery} />
-              <CategoryFilter selected={selectedCategory} onChange={setSelectedCategory} />
-            </div>
-
-            {/* Results Count */}
-            <div className="mb-4 md:mb-6">
-              <p className="text-xs md:text-sm text-cyber-cyan/60 font-mono">
-                &gt; {filteredResources.length} {filteredResources.length === 1 ? 'resource' : 'resources'} found
-              </p>
-            </div>
-
-            {/* Featured Resources */}
-            {featuredResources.length > 0 && (
-              <div className="mb-8 md:mb-12">
-                <h2 className="text-xl md:text-2xl font-bold neon-cyan mb-4 md:mb-6 font-mono uppercase tracking-wider">
-                  &gt; Featured Resources
-                </h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-                  {featuredResources.map((resource) => (
-                    <ResourceCard key={resource.id} resource={resource} />
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* All Resources */}
-            {regularResources.length > 0 && (
-              <div>
-                {featuredResources.length > 0 && (
-                  <h2 className="text-xl md:text-2xl font-bold neon-cyan mb-4 md:mb-6 font-mono uppercase tracking-wider">
-                    &gt; All Resources
-                  </h2>
-                )}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-                  {regularResources.map((resource) => (
-                    <ResourceCard key={resource.id} resource={resource} />
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* No Results */}
-            {filteredResources.length === 0 && (
-              <div className="text-center py-8 md:py-12">
-                <p className="text-cyber-cyan/70 text-base md:text-lg font-mono">
-                  &gt; No resources found matching your criteria.
-                </p>
-                <p className="text-cyber-cyan/50 text-xs md:text-sm mt-2 font-mono">
-                  &gt; Try adjusting your search or filters.
-                </p>
-              </div>
-            )}
-          </>
-        )}
+        <ResourceList resources={resources} />
       </main>
 
       {/* Footer */}
@@ -185,7 +121,6 @@ export default function Home() {
         </div>
       </footer>
     </div>
+    </>
   )
 }
-
-

@@ -54,7 +54,10 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Error creating news source:', error)
     return NextResponse.json(
-      { error: 'Failed to create news source' },
+      { 
+        error: 'Failed to create news source',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      },
       { status: 500 }
     )
   }

@@ -28,9 +28,7 @@ const categoryLabels: Record<Resource['category'], string> = {
 export default function ResourceCard({ resource }: ResourceCardProps) {
   return (
     <Link
-      href={resource.url}
-      target="_blank"
-      rel="noopener noreferrer"
+      href={`/resources/${resource.id}`}
       className="block group"
     >
       <div className="h-full p-4 md:p-6 bg-cyber-dark rounded-sm border border-cyber-cyan/30 cyber-border hover:border-cyber-cyan/60 hover:shadow-[0_0_20px_rgba(0,255,255,0.3)] transition-all duration-200 relative group">

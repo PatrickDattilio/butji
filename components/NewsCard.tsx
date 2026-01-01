@@ -1,5 +1,6 @@
 import { NewsArticle } from '@/types/news'
 import Link from 'next/link'
+import Image from 'next/image'
 
 interface NewsCardProps {
   article: NewsArticle
@@ -30,11 +31,13 @@ export default function NewsCard({ article }: NewsCardProps) {
     >
       <article className="bg-cyber-dark border border-cyber-cyan/20 rounded-sm p-4 md:p-6 hover:border-cyber-cyan/40 hover:bg-cyber-cyan/5 transition-all h-full flex flex-col">
         {article.imageUrl && (
-          <div className="mb-4 overflow-hidden rounded-sm border border-cyber-cyan/20">
-            <img
+          <div className="mb-4 overflow-hidden rounded-sm border border-cyber-cyan/20 relative w-full h-48">
+            <Image
               src={article.imageUrl}
               alt={article.title}
-              className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+              fill
+              className="object-cover group-hover:scale-105 transition-transform duration-300"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               onError={(e) => {
                 // Hide image on error
                 e.currentTarget.style.display = 'none'
@@ -46,7 +49,7 @@ export default function NewsCard({ article }: NewsCardProps) {
         <div className="flex-1 flex flex-col">
           <div className="flex items-center justify-between mb-2 text-xs text-cyber-cyan/60">
             <span className="font-mono uppercase">{article.source}</span>
-            <time className="font-mono">{formatDate(article.publishedAt)}</time>
+            <time className="font-mono" dateTime={article.publishedAt}>{formatDate(article.publishedAt)}</time>
           </div>
           
           <h3 className="text-lg md:text-xl font-bold text-cyber-cyan mb-2 group-hover:text-cyber-cyan/80 transition-colors line-clamp-2">
