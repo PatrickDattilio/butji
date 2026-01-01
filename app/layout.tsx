@@ -9,6 +9,9 @@ export const metadata: Metadata = {
   title: 'Butji - Anti-AI Tools & Resources',
   description: 'A curated collection of tools, websites, and resources to help organize the effort against AI automation.',
   metadataBase: new URL(baseUrl),
+  icons: {
+    icon: '/icon.svg',
+  },
 }
 
 export default function RootLayout({
