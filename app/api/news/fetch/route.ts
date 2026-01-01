@@ -41,8 +41,8 @@ async function fetchRSSFeed(url: string): Promise<RSSItem[]> {
       link: item.link || '',
       pubDate: item.pubDate,
       isoDate: item.isoDate,
-      description: item.contentSnippet || item.content || item.description || '',
-      content: item.content || item.description || '',
+      description: item.contentSnippet || item.content || '',
+      content: item.content || item.contentSnippet || '',
       enclosure: item.enclosure as { url?: string; type?: string } | undefined,
       mediaThumbnail: item.mediaThumbnail as { url?: string } | undefined,
     }))

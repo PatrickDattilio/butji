@@ -264,14 +264,14 @@ export default function AdminPage() {
             </div>
             <div className="flex gap-4">
               <Link
+                className="px-4 py-2 bg-cyber-dark border border-cyber-cyan/40 text-cyber-cyan rounded-sm hover:bg-cyber-cyan/10 transition-all font-mono text-sm"
                 href="/admin/news-sources"
               >
                 News Sources
               </Link>
               <Link
-                className="px-4 py-2 bg-cyber-dark border border-cyber-cyan/40 text-cyber-cyan rounded-sm hover:bg-cyber-cyan/10 transition-all font-mono text-sm"
-                href="/admin/company-submissions"
                 className="px-4 py-2 text-red-400 hover:text-red-300 transition-colors font-mono uppercase text-sm border border-red-500/40 rounded-sm hover:border-red-500/80 terminal-glow"
+                href="/admin/company-submissions"
               >
                 Review Companies
               </Link>
