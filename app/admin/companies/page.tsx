@@ -633,12 +633,15 @@ export default function AdminCompaniesPage() {
                               type="button"
                               onClick={() => {
                                 const newCitations = citations.filter((_, i) => i !== index)
+                                const updatedCitations = { ...formData.citations }
+                                if (newCitations.length > 0) {
+                                  updatedCitations[fieldName] = newCitations
+                                } else {
+                                  delete updatedCitations[fieldName]
+                                }
                                 setFormData({
                                   ...formData,
-                                  citations: {
-                                    ...formData.citations,
-                                    [fieldName]: newCitations.length > 0 ? newCitations : undefined,
-                                  },
+                                  citations: updatedCitations,
                                 })
                               }}
                               className="px-2 py-1 text-xs bg-red-500/20 text-red-400 border border-red-500/40 rounded-sm hover:bg-red-500/30 font-mono"
