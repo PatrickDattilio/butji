@@ -255,10 +255,90 @@ export default function AdminCompanySubmissionsPage() {
                       {submission.founders.length > 0 && <p>Founders: {submission.founders.join(', ')}</p>}
                       {submission.products.length > 0 && <p>Products: {submission.products.join(', ')}</p>}
                     </div>
-                    {submission.controversies && (
-                      <div className="mb-3 p-3 bg-red-500/10 border border-red-500/30 rounded-sm">
-                        <p className="text-xs font-bold text-red-400 mb-1 font-mono uppercase">Controversies:</p>
-                        <p className="text-red-300/80 font-mono text-sm">{submission.controversies}</p>
+                    {submission.controversies && Array.isArray(submission.controversies) && submission.controversies.length > 0 && (
+                      <div className="mb-3 space-y-2">
+                        <p className="text-xs font-bold text-red-400 mb-2 font-mono uppercase">Controversies:</p>
+                        {submission.controversies.map((controversy, index) => (
+                          <div key={index} className="p-3 bg-red-500/10 border border-red-500/30 rounded-sm">
+                            {controversy.date && (
+                              <p className="text-xs font-bold text-red-400 mb-1 font-mono">{controversy.date}</p>
+                            )}
+                            <p className="text-red-300/80 font-mono text-sm mb-2">{controversy.text}</p>
+                            {controversy.citations && controversy.citations.length > 0 && (
+                              <div className="mt-2 pt-2 border-t border-red-500/20">
+                                <p className="text-xs text-red-400/50 font-mono uppercase mb-1">Sources:</p>
+                                <ul className="list-disc list-inside ml-2 space-y-1">
+                                  {controversy.citations.map((citation, citIndex) => (
+                                    <li key={citIndex} className="text-xs text-red-400/70 font-mono">
+                                      {citation.title ? (
+                                        <>
+                                          <a
+                                            href={citation.url}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="text-red-400 hover:text-red-300 underline"
+                                          >
+                                            {citation.title}
+                                          </a>
+                                          {citation.date && <span className="text-red-400/50 ml-1">({citation.date})</span>}
+                                        </>
+                                      ) : (
+                                        <a
+                                          href={citation.url}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          className="text-red-400 hover:text-red-300 underline break-all"
+                                        >
+                                          {citation.url}
+                                        </a>
+                                      )}
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    {submission.citations && Object.keys(submission.citations).length > 0 && (
+                      <div className="mb-3 p-3 bg-cyber-darker border border-red-500/30 rounded-sm">
+                        <p className="text-xs font-bold text-red-400 mb-2 font-mono uppercase">Citations:</p>
+                        <div className="space-y-2 text-xs font-mono">
+                          {Object.entries(submission.citations).map(([field, citations]) => (
+                            <div key={field}>
+                              <p className="text-red-400/60 mb-1 uppercase">{field}:</p>
+                              <ul className="list-disc list-inside ml-2 space-y-1">
+                                {citations.map((citation, index) => (
+                                  <li key={index} className="text-red-400/70">
+                                    {citation.title ? (
+                                      <>
+                                        <a
+                                          href={citation.url}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          className="text-red-400 hover:text-red-300 underline"
+                                        >
+                                          {citation.title}
+                                        </a>
+                                        {citation.date && <span className="text-red-400/50 ml-1">({citation.date})</span>}
+                                      </>
+                                    ) : (
+                                      <a
+                                        href={citation.url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-red-400 hover:text-red-300 underline break-all"
+                                      >
+                                        {citation.url}
+                                      </a>
+                                    )}
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     )}
                     <div className="flex flex-wrap gap-2 mb-3">

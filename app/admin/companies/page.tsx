@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
-import { Company, CompanyTag } from '@/types/company'
+import { Company, CompanyTag, Citation, ControversyInfo } from '@/types/company'
 import Link from 'next/link'
 
 const availableTags: { value: CompanyTag; label: string }[] = [
@@ -30,6 +30,7 @@ export default function AdminCompaniesPage() {
   const [formData, setFormData] = useState<Partial<Company> & {
     founders?: string[] | string
     products?: string[] | string
+    citations?: Record<string, Citation[]>
   }>({
     name: '',
     description: '',
@@ -41,9 +42,10 @@ export default function AdminCompaniesPage() {
     funding: '',
     valuation: '',
     products: [],
-    controversies: '',
+    controversies: [],
     layoffs: [],
     tags: [],
+    citations: {},
     featured: false,
   })
 
@@ -91,9 +93,10 @@ export default function AdminCompaniesPage() {
       funding: '',
       valuation: '',
       products: [],
-      controversies: '',
+      controversies: [],
       layoffs: [],
       tags: [],
+      citations: {},
       featured: false,
     })
     setEditingId(null)
@@ -152,9 +155,10 @@ export default function AdminCompaniesPage() {
       funding: typeof company.funding === 'string' ? company.funding : JSON.stringify(company.funding),
       valuation: company.valuation || '',
       products: company.products,
-      controversies: company.controversies || '',
+      controversies: company.controversies || [],
       layoffs: company.layoffs || [],
       tags: company.tags,
+      citations: company.citations || {},
       featured: company.featured || false,
     })
     setEditingId(company.id)
@@ -354,15 +358,165 @@ export default function AdminCompaniesPage() {
               />
             </div>
 
+            {/* Controversies Editor */}
             <div>
-              <label className="block text-sm font-bold text-red-400 mb-1 font-mono uppercase">Controversies</label>
-              <textarea
-                value={formData.controversies}
-                onChange={(e) => setFormData({ ...formData, controversies: e.target.value })}
-                rows={4}
-                className="w-full px-3 py-2 border border-red-500/40 rounded-sm bg-cyber-darker text-red-400 focus:outline-none focus:border-red-500/80 font-mono"
-                placeholder="List controversies, data scraping incidents, etc."
-              />
+              <div className="flex items-center justify-between mb-2">
+                <label className="block text-sm font-bold text-red-400 font-mono uppercase">Controversies</label>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const current = Array.isArray(formData.controversies) ? formData.controversies : []
+                    setFormData({
+                      ...formData,
+                      controversies: [...current, { text: '', date: '', citations: [] }],
+                    })
+                  }}
+                  className="px-2 py-1 text-xs bg-red-500/20 text-red-400 border border-red-500/40 rounded-sm hover:bg-red-500/30 font-mono"
+                >
+                  + Add Controversy
+                </button>
+              </div>
+              <p className="text-xs text-red-400/60 font-mono mb-3">Add controversies with their own citations.</p>
+              
+              {Array.isArray(formData.controversies) && formData.controversies.map((controversy, index) => (
+                <div key={index} className="mb-4 p-3 bg-cyber-darker border border-red-500/30 rounded-sm">
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="text-sm font-bold text-red-400/80 font-mono uppercase">Controversy {index + 1}</label>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const current = Array.isArray(formData.controversies) ? formData.controversies : []
+                        setFormData({
+                          ...formData,
+                          controversies: current.filter((_, i) => i !== index),
+                        })
+                      }}
+                      className="px-2 py-1 text-xs bg-red-500/20 text-red-400 border border-red-500/40 rounded-sm hover:bg-red-500/30 font-mono"
+                    >
+                      × Remove
+                    </button>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <div>
+                      <label className="block text-xs font-bold text-red-400/60 mb-1 font-mono uppercase">Description *</label>
+                      <textarea
+                        value={controversy.text || ''}
+                        onChange={(e) => {
+                          const current = Array.isArray(formData.controversies) ? formData.controversies : []
+                          const updated = [...current]
+                          updated[index] = { ...controversy, text: e.target.value }
+                          setFormData({ ...formData, controversies: updated })
+                        }}
+                        rows={3}
+                        className="w-full px-2 py-1 text-xs border border-red-500/40 rounded-sm bg-cyber-dark text-red-400 focus:outline-none focus:border-red-500/80 font-mono"
+                        placeholder="Describe the controversy..."
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className="block text-xs font-bold text-red-400/60 mb-1 font-mono uppercase">Date (optional)</label>
+                      <input
+                        type="text"
+                        value={controversy.date || ''}
+                        onChange={(e) => {
+                          const current = Array.isArray(formData.controversies) ? formData.controversies : []
+                          const updated = [...current]
+                          updated[index] = { ...controversy, date: e.target.value }
+                          setFormData({ ...formData, controversies: updated })
+                        }}
+                        className="w-full px-2 py-1 text-xs border border-red-500/40 rounded-sm bg-cyber-dark text-red-400 focus:outline-none focus:border-red-500/80 font-mono"
+                        placeholder="e.g., 2023-01-15"
+                      />
+                    </div>
+                    
+                    {/* Citations for this controversy */}
+                    <div>
+                      <label className="block text-xs font-bold text-red-400/60 mb-1 font-mono uppercase">Citations</label>
+                      {(controversy.citations || []).map((citation, citIndex) => (
+                        <div key={citIndex} className="mb-2 p-2 bg-cyber-dark border border-red-500/20 rounded-sm space-y-2">
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                            <div className="md:col-span-2">
+                              <input
+                                type="url"
+                                placeholder="Citation URL *"
+                                value={citation.url}
+                                onChange={(e) => {
+                                  const current = Array.isArray(formData.controversies) ? formData.controversies : []
+                                  const updated = [...current]
+                                  const updatedCitations = [...(updated[index].citations || [])]
+                                  updatedCitations[citIndex] = { ...citation, url: e.target.value }
+                                  updated[index] = { ...updated[index], citations: updatedCitations }
+                                  setFormData({ ...formData, controversies: updated })
+                                }}
+                                className="w-full px-2 py-1 text-xs border border-red-500/40 rounded-sm bg-cyber-darker text-red-400 focus:outline-none focus:border-red-500/80 font-mono"
+                              />
+                            </div>
+                            <div>
+                              <input
+                                type="text"
+                                placeholder="Title (optional)"
+                                value={citation.title || ''}
+                                onChange={(e) => {
+                                  const current = Array.isArray(formData.controversies) ? formData.controversies : []
+                                  const updated = [...current]
+                                  const updatedCitations = [...(updated[index].citations || [])]
+                                  updatedCitations[citIndex] = { ...citation, title: e.target.value }
+                                  updated[index] = { ...updated[index], citations: updatedCitations }
+                                  setFormData({ ...formData, controversies: updated })
+                                }}
+                                className="w-full px-2 py-1 text-xs border border-red-500/40 rounded-sm bg-cyber-darker text-red-400 focus:outline-none focus:border-red-500/80 font-mono"
+                              />
+                            </div>
+                            <div className="flex gap-2">
+                              <input
+                                type="text"
+                                placeholder="Date (optional)"
+                                value={citation.date || ''}
+                                onChange={(e) => {
+                                  const current = Array.isArray(formData.controversies) ? formData.controversies : []
+                                  const updated = [...current]
+                                  const updatedCitations = [...(updated[index].citations || [])]
+                                  updatedCitations[citIndex] = { ...citation, date: e.target.value }
+                                  updated[index] = { ...updated[index], citations: updatedCitations }
+                                  setFormData({ ...formData, controversies: updated })
+                                }}
+                                className="flex-1 px-2 py-1 text-xs border border-red-500/40 rounded-sm bg-cyber-darker text-red-400 focus:outline-none focus:border-red-500/80 font-mono"
+                              />
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const current = Array.isArray(formData.controversies) ? formData.controversies : []
+                                  const updated = [...current]
+                                  const updatedCitations = (updated[index].citations || []).filter((_, i) => i !== citIndex)
+                                  updated[index] = { ...updated[index], citations: updatedCitations }
+                                  setFormData({ ...formData, controversies: updated })
+                                }}
+                                className="px-2 py-1 text-xs bg-red-500/20 text-red-400 border border-red-500/40 rounded-sm hover:bg-red-500/30 font-mono"
+                              >
+                                ×
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const current = Array.isArray(formData.controversies) ? formData.controversies : []
+                          const updated = [...current]
+                          const updatedCitations = [...(updated[index].citations || []), { url: '', title: '', date: '' }]
+                          updated[index] = { ...updated[index], citations: updatedCitations }
+                          setFormData({ ...formData, controversies: updated })
+                        }}
+                        className="px-2 py-1 text-xs bg-red-500/20 text-red-400 border border-red-500/40 rounded-sm hover:bg-red-500/30 font-mono"
+                      >
+                        + Add Citation
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
 
             <div>
@@ -383,6 +537,121 @@ export default function AdminCompaniesPage() {
                   </button>
                 ))}
               </div>
+            </div>
+
+            {/* Citations Editor */}
+            <div>
+              <label className="block text-sm font-bold text-red-400 mb-2 font-mono uppercase">Citations</label>
+              <p className="text-xs text-red-400/60 font-mono mb-3">Add sources/citations for claims. Each field can have multiple citations.</p>
+              
+              {['description', 'ceo', 'foundedYear', 'valuation', 'funding', 'founders', 'products'].map((fieldName) => {
+                const fieldLabel = fieldName.charAt(0).toUpperCase() + fieldName.slice(1).replace(/([A-Z])/g, ' $1')
+                const citations = formData.citations?.[fieldName] || []
+                
+                return (
+                  <div key={fieldName} className="mb-4 p-3 bg-cyber-darker border border-red-500/30 rounded-sm">
+                    <div className="flex items-center justify-between mb-2">
+                      <label className="text-sm font-bold text-red-400/80 font-mono uppercase">{fieldLabel}</label>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const newCitations = [...(formData.citations?.[fieldName] || []), { url: '', title: '', date: '' }]
+                          setFormData({
+                            ...formData,
+                            citations: {
+                              ...formData.citations,
+                              [fieldName]: newCitations,
+                            },
+                          })
+                        }}
+                        className="px-2 py-1 text-xs bg-red-500/20 text-red-400 border border-red-500/40 rounded-sm hover:bg-red-500/30 font-mono"
+                      >
+                        + Add Citation
+                      </button>
+                    </div>
+                    
+                    {citations.map((citation, index) => (
+                      <div key={index} className="mb-2 p-2 bg-cyber-dark border border-red-500/20 rounded-sm space-y-2">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                          <div className="md:col-span-2">
+                            <input
+                              type="url"
+                              placeholder="Citation URL *"
+                              value={citation.url}
+                              onChange={(e) => {
+                                const newCitations = [...citations]
+                                newCitations[index] = { ...citation, url: e.target.value }
+                                setFormData({
+                                  ...formData,
+                                  citations: {
+                                    ...formData.citations,
+                                    [fieldName]: newCitations,
+                                  },
+                                })
+                              }}
+                              className="w-full px-2 py-1 text-xs border border-red-500/40 rounded-sm bg-cyber-darker text-red-400 focus:outline-none focus:border-red-500/80 font-mono"
+                            />
+                          </div>
+                          <div>
+                            <input
+                              type="text"
+                              placeholder="Title (optional)"
+                              value={citation.title || ''}
+                              onChange={(e) => {
+                                const newCitations = [...citations]
+                                newCitations[index] = { ...citation, title: e.target.value }
+                                setFormData({
+                                  ...formData,
+                                  citations: {
+                                    ...formData.citations,
+                                    [fieldName]: newCitations,
+                                  },
+                                })
+                              }}
+                              className="w-full px-2 py-1 text-xs border border-red-500/40 rounded-sm bg-cyber-darker text-red-400 focus:outline-none focus:border-red-500/80 font-mono"
+                            />
+                          </div>
+                          <div className="flex gap-2">
+                            <input
+                              type="text"
+                              placeholder="Date (optional)"
+                              value={citation.date || ''}
+                              onChange={(e) => {
+                                const newCitations = [...citations]
+                                newCitations[index] = { ...citation, date: e.target.value }
+                                setFormData({
+                                  ...formData,
+                                  citations: {
+                                    ...formData.citations,
+                                    [fieldName]: newCitations,
+                                  },
+                                })
+                              }}
+                              className="flex-1 px-2 py-1 text-xs border border-red-500/40 rounded-sm bg-cyber-darker text-red-400 focus:outline-none focus:border-red-500/80 font-mono"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const newCitations = citations.filter((_, i) => i !== index)
+                                setFormData({
+                                  ...formData,
+                                  citations: {
+                                    ...formData.citations,
+                                    [fieldName]: newCitations.length > 0 ? newCitations : undefined,
+                                  },
+                                })
+                              }}
+                              className="px-2 py-1 text-xs bg-red-500/20 text-red-400 border border-red-500/40 rounded-sm hover:bg-red-500/30 font-mono"
+                            >
+                              ×
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )
+              })}
             </div>
 
             <div className="flex items-center gap-4">

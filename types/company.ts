@@ -10,9 +10,10 @@ export interface Company {
   funding?: string | FundingInfo
   valuation?: string
   products: string[]
-  controversies?: string
+  controversies?: ControversyInfo[]
   layoffs?: LayoffInfo[]
   tags: CompanyTag[]
+  citations?: Record<string, Citation[]>
   featured?: boolean
   approved?: boolean
   createdAt?: string
@@ -45,4 +46,16 @@ export interface LayoffInfo {
   percentage?: string
   reason?: string
   source?: string
+}
+
+export interface ControversyInfo {
+  text: string
+  date?: string
+  citations?: Citation[]
+}
+
+export interface Citation {
+  url: string
+  title?: string
+  date?: string
 }

@@ -1,4 +1,4 @@
-import { Company } from '@/types/company'
+import { Company, ControversyInfo } from '@/types/company'
 import { prisma } from './prisma'
 
 export async function getAllCompanies(): Promise<Company[]> {
@@ -20,9 +20,10 @@ export async function getAllCompanies(): Promise<Company[]> {
       funding: c.funding ? (tryParseJSON(c.funding) || c.funding) : undefined,
       valuation: c.valuation || undefined,
       products: JSON.parse(c.products) as string[],
-      controversies: c.controversies || undefined,
+      controversies: c.controversies ? (tryParseControversies(c.controversies)) : undefined,
       layoffs: c.layoffs ? (JSON.parse(c.layoffs) as Company['layoffs']) : undefined,
       tags: JSON.parse(c.tags) as Company['tags'],
+      citations: c.citations ? (tryParseJSON(c.citations) as Company['citations']) : undefined,
       featured: c.featured,
       approved: c.approved,
       createdAt: c.createdAt.toISOString(),
@@ -54,9 +55,10 @@ export async function getCompanyById(id: string): Promise<Company | null> {
       funding: company.funding ? (tryParseJSON(company.funding) || company.funding) : undefined,
       valuation: company.valuation || undefined,
       products: JSON.parse(company.products) as string[],
-      controversies: company.controversies || undefined,
+      controversies: company.controversies ? (tryParseControversies(company.controversies)) : undefined,
       layoffs: company.layoffs ? (JSON.parse(company.layoffs) as Company['layoffs']) : undefined,
       tags: JSON.parse(company.tags) as Company['tags'],
+      citations: company.citations ? (tryParseJSON(company.citations) as Company['citations']) : undefined,
       featured: company.featured,
       approved: company.approved,
       createdAt: company.createdAt.toISOString(),
@@ -81,9 +83,10 @@ export async function createCompany(company: Omit<Company, 'id' | 'createdAt' | 
       funding: typeof company.funding === 'string' ? company.funding : JSON.stringify(company.funding),
       valuation: company.valuation,
       products: JSON.stringify(company.products),
-      controversies: company.controversies,
+      controversies: company.controversies ? JSON.stringify(company.controversies) : null,
       layoffs: company.layoffs ? JSON.stringify(company.layoffs) : null,
       tags: JSON.stringify(company.tags),
+      citations: company.citations ? JSON.stringify(company.citations) : null,
       featured: company.featured || false,
       approved: company.approved !== false,
     },
@@ -100,10 +103,11 @@ export async function createCompany(company: Omit<Company, 'id' | 'createdAt' | 
     foundedYear: created.foundedYear || undefined,
     funding: created.funding ? (tryParseJSON(created.funding) || created.funding) : undefined,
     valuation: created.valuation || undefined,
-    products: JSON.parse(created.products) as string[],
-    controversies: created.controversies || undefined,
-    layoffs: created.layoffs ? (JSON.parse(created.layoffs) as Company['layoffs']) : undefined,
+      products: JSON.parse(created.products) as string[],
+      controversies: created.controversies ? (tryParseControversies(created.controversies)) : undefined,
+      layoffs: created.layoffs ? (JSON.parse(created.layoffs) as Company['layoffs']) : undefined,
     tags: JSON.parse(created.tags) as Company['tags'],
+    citations: created.citations ? (tryParseJSON(created.citations) as Company['citations']) : undefined,
     featured: created.featured,
     approved: created.approved,
     createdAt: created.createdAt.toISOString(),
@@ -125,9 +129,10 @@ export async function updateCompany(id: string, company: Partial<Omit<Company, '
       funding: company.funding ? (typeof company.funding === 'string' ? company.funding : JSON.stringify(company.funding)) : undefined,
       valuation: company.valuation,
       products: company.products ? JSON.stringify(company.products) : undefined,
-      controversies: company.controversies,
+      controversies: company.controversies ? JSON.stringify(company.controversies) : undefined,
       layoffs: company.layoffs ? JSON.stringify(company.layoffs) : undefined,
       tags: company.tags ? JSON.stringify(company.tags) : undefined,
+      citations: company.citations ? JSON.stringify(company.citations) : undefined,
       featured: company.featured,
       approved: company.approved,
     },
@@ -144,10 +149,11 @@ export async function updateCompany(id: string, company: Partial<Omit<Company, '
     foundedYear: updated.foundedYear || undefined,
     funding: updated.funding ? (tryParseJSON(updated.funding) || updated.funding) : undefined,
     valuation: updated.valuation || undefined,
-    products: JSON.parse(updated.products) as string[],
-    controversies: updated.controversies || undefined,
-    layoffs: updated.layoffs ? (JSON.parse(updated.layoffs) as Company['layoffs']) : undefined,
+      products: JSON.parse(updated.products) as string[],
+      controversies: updated.controversies ? (tryParseControversies(updated.controversies)) : undefined,
+      layoffs: updated.layoffs ? (JSON.parse(updated.layoffs) as Company['layoffs']) : undefined,
     tags: JSON.parse(updated.tags) as Company['tags'],
+    citations: updated.citations ? (tryParseJSON(updated.citations) as Company['citations']) : undefined,
     featured: updated.featured,
     approved: updated.approved,
     createdAt: updated.createdAt.toISOString(),
@@ -166,5 +172,23 @@ function tryParseJSON(str: string): any {
     return JSON.parse(str)
   } catch {
     return null
+  }
+}
+
+function tryParseControversies(str: string): ControversyInfo[] | undefined {
+  try {
+    const parsed = JSON.parse(str)
+    // If it's already an array, return it
+    if (Array.isArray(parsed)) {
+      return parsed as ControversyInfo[]
+    }
+    // If it's a plain string (old format), convert to array with single item
+    if (typeof parsed === 'string') {
+      return [{ text: parsed }]
+    }
+    return undefined
+  } catch {
+    // If parsing fails, treat as old format plain string
+    return [{ text: str }]
   }
 }

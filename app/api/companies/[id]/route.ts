@@ -32,7 +32,48 @@ export async function PATCH(
 
     const { id } = await params
     const body = await request.json()
-    const company = await updateCompany(id, body)
+    
+    // Clean up controversies - remove empty ones and clean citations within each
+    const cleanedControversies = body.controversies !== undefined
+      ? (Array.isArray(body.controversies)
+          ? body.controversies
+              .map((c: any) => {
+                if (!c || !c.text || !c.text.trim()) return null
+                // Clean citations within controversy
+                const cleanedCitations = c.citations && Array.isArray(c.citations)
+                  ? c.citations.filter((cit: any) => cit && cit.url && cit.url.trim())
+                  : []
+                return {
+                  text: c.text.trim(),
+                  date: c.date?.trim() || undefined,
+                  citations: cleanedCitations.length > 0 ? cleanedCitations : undefined,
+                }
+              })
+              .filter((c: any) => c !== null)
+          : undefined)
+      : undefined
+
+    // Clean up citations - remove empty citations and empty fields
+    // Also remove 'controversies' key since citations are now embedded in controversy objects
+    const cleanedCitations = body.citations ? Object.entries(body.citations).reduce((acc, [key, value]) => {
+      // Skip controversies key - citations are now embedded in controversy objects
+      if (key === 'controversies') return acc
+      const citations = (value as any[]).filter((c: any) => c.url && c.url.trim())
+      if (citations.length > 0) {
+        acc[key] = citations
+      }
+      return acc
+    }, {} as Record<string, any>) : undefined
+
+    const updateData = { ...body }
+    if (cleanedControversies !== undefined) {
+      updateData.controversies = cleanedControversies.length > 0 ? cleanedControversies : undefined
+    }
+    if (cleanedCitations !== undefined) {
+      updateData.citations = cleanedCitations
+    }
+    
+    const company = await updateCompany(id, updateData)
     return NextResponse.json(company)
   } catch (error) {
     console.error('Error updating company:', error)

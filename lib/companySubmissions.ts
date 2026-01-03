@@ -1,4 +1,4 @@
-import { Company } from '@/types/company'
+import { Company, ControversyInfo } from '@/types/company'
 import { prisma } from './prisma'
 
 export interface CompanySubmission extends Omit<Company, 'id' | 'createdAt' | 'updatedAt'> {
@@ -29,9 +29,10 @@ export async function getCompanySubmissions(): Promise<CompanySubmission[]> {
       funding: s.funding ? (tryParseJSON(s.funding) || s.funding) : undefined,
       valuation: s.valuation || undefined,
       products: JSON.parse(s.products) as string[],
-      controversies: s.controversies || undefined,
+      controversies: s.controversies ? (tryParseControversies(s.controversies)) : undefined,
       layoffs: s.layoffs ? (JSON.parse(s.layoffs) as Company['layoffs']) : undefined,
       tags: JSON.parse(s.tags) as Company['tags'],
+      citations: s.citations ? (tryParseJSON(s.citations) as Company['citations']) : undefined,
       featured: s.featured,
       status: s.status as 'pending' | 'approved' | 'rejected',
       submittedAt: s.submittedAt.toISOString(),
@@ -73,9 +74,10 @@ export async function updateCompanySubmission(
     }
     if (updates.valuation !== undefined) updateData.valuation = updates.valuation
     if (updates.products) updateData.products = JSON.stringify(updates.products)
-    if (updates.controversies !== undefined) updateData.controversies = updates.controversies
+    if (updates.controversies !== undefined) updateData.controversies = updates.controversies ? JSON.stringify(updates.controversies) : null
     if (updates.layoffs) updateData.layoffs = JSON.stringify(updates.layoffs)
     if (updates.tags) updateData.tags = JSON.stringify(updates.tags)
+    if (updates.citations !== undefined) updateData.citations = updates.citations ? JSON.stringify(updates.citations) : null
     if (updates.status) updateData.status = updates.status
     if (updates.featured !== undefined) updateData.featured = updates.featured
     if (updates.reviewedAt) updateData.reviewedAt = new Date(updates.reviewedAt)
@@ -106,6 +108,7 @@ export async function updateCompanySubmission(
             controversies: submission.controversies,
             layoffs: submission.layoffs,
             tags: submission.tags,
+            citations: submission.citations,
             featured: submission.featured,
             approved: true,
           },
@@ -137,5 +140,23 @@ function tryParseJSON(str: string): any {
     return JSON.parse(str)
   } catch {
     return null
+  }
+}
+
+function tryParseControversies(str: string): ControversyInfo[] | undefined {
+  try {
+    const parsed = JSON.parse(str)
+    // If it's already an array, return it
+    if (Array.isArray(parsed)) {
+      return parsed as ControversyInfo[]
+    }
+    // If it's a plain string (old format), convert to array with single item
+    if (typeof parsed === 'string') {
+      return [{ text: parsed }]
+    }
+    return undefined
+  } catch {
+    // If parsing fails, treat as old format plain string
+    return [{ text: str }]
   }
 }

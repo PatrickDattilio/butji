@@ -21,6 +21,37 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
+    
+    // Clean up controversies - remove empty ones and clean citations within each
+    const cleanedControversies = body.controversies && Array.isArray(body.controversies)
+      ? body.controversies
+          .map((c: any) => {
+            if (!c || !c.text || !c.text.trim()) return null
+            // Clean citations within controversy
+            const cleanedCitations = c.citations && Array.isArray(c.citations)
+              ? c.citations.filter((cit: any) => cit && cit.url && cit.url.trim())
+              : []
+            return {
+              text: c.text.trim(),
+              date: c.date?.trim() || undefined,
+              citations: cleanedCitations.length > 0 ? cleanedCitations : undefined,
+            }
+          })
+          .filter((c: any) => c !== null)
+      : undefined
+
+    // Clean up citations - remove empty citations and empty fields
+    // Also remove 'controversies' key since citations are now embedded in controversy objects
+    const cleanedCitations = body.citations ? Object.entries(body.citations).reduce((acc, [key, value]) => {
+      // Skip controversies key - citations are now embedded in controversy objects
+      if (key === 'controversies') return acc
+      const citations = (value as any[]).filter((c: any) => c.url && c.url.trim())
+      if (citations.length > 0) {
+        acc[key] = citations
+      }
+      return acc
+    }, {} as Record<string, any>) : undefined
+
     const company = await createCompany({
       name: body.name,
       description: body.description,
@@ -32,9 +63,10 @@ export async function POST(request: NextRequest) {
       funding: body.funding,
       valuation: body.valuation,
       products: body.products || [],
-      controversies: body.controversies,
+      controversies: cleanedControversies,
       layoffs: body.layoffs,
       tags: body.tags || [],
+      citations: cleanedCitations,
       featured: body.featured || false,
       approved: body.approved !== false,
     })
