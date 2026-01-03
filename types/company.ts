@@ -3,6 +3,7 @@ export interface Company {
   name: string
   description: string
   website?: string
+  logoUrl?: string
   founders: string[]
   ceo?: string
   foundedYear?: number

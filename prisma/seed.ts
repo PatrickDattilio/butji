@@ -210,7 +210,7 @@ async function main() {
     },
     {
       title: 'Butlerian Jihad',
-      description: 'A resource and community inspired by the Butlerian Jihad concept, organizing resistance against AI systems that threaten human creativity and labor.',
+      description: 'An anti-AI and privacy focused financial planner and ledger.',
       url: 'https://butlerianjihad.io',
       category: 'website',
       tags: JSON.stringify(['education', 'advocacy']),

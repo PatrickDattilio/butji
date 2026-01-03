@@ -22,6 +22,7 @@ export async function getCompanySubmissions(): Promise<CompanySubmission[]> {
       name: s.name,
       description: s.description,
       website: s.website || undefined,
+      logoUrl: s.logoUrl || undefined,
       founders: JSON.parse(s.founders) as string[],
       ceo: s.ceo || undefined,
       foundedYear: s.foundedYear || undefined,
@@ -61,6 +62,7 @@ export async function updateCompanySubmission(
     if (updates.name) updateData.name = updates.name
     if (updates.description) updateData.description = updates.description
     if (updates.website !== undefined) updateData.website = updates.website
+    if (updates.logoUrl !== undefined) updateData.logoUrl = updates.logoUrl
     if (updates.founders) updateData.founders = JSON.stringify(updates.founders)
     if (updates.ceo !== undefined) updateData.ceo = updates.ceo
     if (updates.foundedYear !== undefined) updateData.foundedYear = updates.foundedYear
@@ -94,6 +96,7 @@ export async function updateCompanySubmission(
             name: submission.name,
             description: submission.description,
             website: submission.website,
+            logoUrl: submission.logoUrl,
             founders: submission.founders,
             ceo: submission.ceo,
             foundedYear: submission.foundedYear,

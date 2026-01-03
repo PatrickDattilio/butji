@@ -34,6 +34,7 @@ export default function AdminCompaniesPage() {
     name: '',
     description: '',
     website: '',
+    logoUrl: '',
     founders: [],
     ceo: '',
     foundedYear: undefined,
@@ -83,6 +84,7 @@ export default function AdminCompaniesPage() {
       name: '',
       description: '',
       website: '',
+      logoUrl: '',
       founders: [],
       ceo: '',
       foundedYear: undefined,
@@ -143,6 +145,7 @@ export default function AdminCompaniesPage() {
       name: company.name,
       description: company.description,
       website: company.website || '',
+      logoUrl: company.logoUrl || '',
       founders: company.founders,
       ceo: company.ceo || '',
       foundedYear: company.foundedYear,
@@ -266,6 +269,16 @@ export default function AdminCompaniesPage() {
                   value={formData.website}
                   onChange={(e) => setFormData({ ...formData, website: e.target.value })}
                   className="w-full px-3 py-2 border border-red-500/40 rounded-sm bg-cyber-darker text-red-400 focus:outline-none focus:border-red-500/80 font-mono"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-bold text-red-400 mb-1 font-mono uppercase">Logo URL</label>
+                <input
+                  type="url"
+                  value={formData.logoUrl}
+                  onChange={(e) => setFormData({ ...formData, logoUrl: e.target.value })}
+                  className="w-full px-3 py-2 border border-red-500/40 rounded-sm bg-cyber-darker text-red-400 focus:outline-none focus:border-red-500/80 font-mono"
+                  placeholder="https://example.com/logo.png or /logos/company.svg"
                 />
               </div>
               <div>

@@ -1,8 +1,14 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
   <defs>
-    <!-- Glow filter for neon effect -->
-    <filter id="neon-glow" x="-50%" y="-50%" width="200%" height="200%">
+    <filter id="glow">
       <feGaussianBlur stdDeviation="1.5" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="redGlow">
+      <feGaussianBlur stdDeviation="1.2" result="coloredBlur"/>
       <feMerge>
         <feMergeNode in="coloredBlur"/>
         <feMergeNode in="SourceGraphic"/>
@@ -10,21 +16,48 @@
     </filter>
   </defs>
   
-  <!-- Dark background matching site theme -->
+  <!-- Background -->
   <rect width="32" height="32" fill="#0a0a0a"/>
   
-  <!-- Terminal prompt ">" symbol - main shape -->
-  <text 
-    x="16" 
-    y="22" 
-    font-family="'Courier New', Monaco, monospace" 
-    font-size="18" 
-    font-weight="bold"
-    fill="#00ffff"
-    text-anchor="middle"
-    dominant-baseline="central"
-    filter="url(#neon-glow)"
-  >
-    &gt;
-  </text>
+  <!-- Circuit board grid (bottom half) -->
+  <g stroke="#00ff00" stroke-width="0.5" opacity="0.5">
+    <!-- Horizontal lines -->
+    <line x1="4" y1="20" x2="28" y2="20"/>
+    <line x1="4" y1="22" x2="28" y2="22"/>
+    <line x1="4" y1="24" x2="28" y2="24"/>
+    <line x1="4" y1="26" x2="28" y2="26"/>
+    <!-- Vertical lines -->
+    <line x1="10" y1="18" x2="10" y2="28"/>
+    <line x1="16" y1="18" x2="16" y2="28"/>
+    <line x1="22" y1="18" x2="22" y2="28"/>
+  </g>
+  
+  <!-- Impact point - Red X -->
+  <g stroke="#ff4444" stroke-width="2" stroke-linecap="round" filter="url(#redGlow)">
+    <line x1="14" y1="20" x2="18" y2="24"/>
+    <line x1="18" y1="20" x2="14" y2="24"/>
+  </g>
+  
+  <!-- Energy sparks at impact -->
+  <circle cx="16" cy="22" r="1" fill="#00ffff" filter="url(#glow)"/>
+  <circle cx="16" cy="21" r="0.7" fill="#00ffff" filter="url(#glow)"/>
+  <circle cx="16" cy="23" r="0.7" fill="#00ffff" filter="url(#glow)"/>
+  
+  <!-- Fist (top half, centered) -->
+  <g fill="#00ffff" filter="url(#glow)">
+    <!-- Wrist -->
+    <rect x="15" y="10" width="2" height="3" rx="0.8"/>
+    
+    <!-- Main hand -->
+    <rect x="12" y="5" width="8" height="7" rx="1.5"/>
+    
+    <!-- Thumb (left side) -->
+    <rect x="11" y="7" width="2" height="3" rx="1"/>
+    
+    <!-- Fingers (top) -->
+    <rect x="13.5" y="2" width="1.8" height="4" rx="0.8"/>
+    <rect x="15.5" y="2" width="1.8" height="4.5" rx="0.8"/>
+    <rect x="17.5" y="2" width="1.8" height="4" rx="0.8"/>
+    <rect x="19.5" y="2.5" width="1.8" height="3.5" rx="0.8"/>
+  </g>
 </svg>

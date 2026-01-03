@@ -25,6 +25,7 @@ export async function POST(request: NextRequest) {
       name: body.name,
       description: body.description,
       website: body.website,
+      logoUrl: body.logoUrl,
       founders: body.founders || [],
       ceo: body.ceo,
       foundedYear: body.foundedYear,

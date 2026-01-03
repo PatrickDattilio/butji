@@ -50,6 +50,7 @@ model Company {
   name          String
   description   String   @db.Text
   website       String?
+  logoUrl       String?
   founders      String   // JSON array stored as string
   ceo           String?
   foundedYear   Int?
@@ -73,6 +74,7 @@ model CompanySubmission {
   name            String
   description     String   @db.Text
   website         String?
+  logoUrl         String?
   founders        String   // JSON array stored as string
   ceo             String?
   foundedYear     Int?

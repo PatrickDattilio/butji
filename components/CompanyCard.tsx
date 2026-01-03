@@ -33,8 +33,21 @@ export default function CompanyCard({ company }: CompanyCardProps) {
             </span>
           </div>
         )}
-        <div className="flex items-start justify-between mb-3">
-          <h3 className="text-lg font-bold text-red-400 group-hover:text-red-300 transition-colors font-mono">
+        <div className="flex items-start justify-between mb-3 gap-3">
+          {company.logoUrl && (
+            <div className="flex-shrink-0">
+              <img
+                src={company.logoUrl}
+                alt={`${company.name} logo`}
+                className="w-12 h-12 object-contain rounded-sm border border-red-500/30 bg-cyber-darker/50 p-1"
+                onError={(e) => {
+                  // Hide image if it fails to load
+                  e.currentTarget.style.display = 'none'
+                }}
+              />
+            </div>
+          )}
+          <h3 className="text-lg font-bold text-red-400 group-hover:text-red-300 transition-colors font-mono flex-1">
             &gt; {company.name}
           </h3>
         </div>

@@ -4,6 +4,7 @@ import { getResourceById, getApprovedResources } from '@/lib/resources'
 import Link from 'next/link'
 import { generateBreadcrumbSchema, renderStructuredData } from '@/lib/seo'
 import { Resource } from '@/types/resource'
+import ShareButtons from '@/components/ShareButtons'
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXTAUTH_URL || 'https://butji.com'
 
@@ -153,6 +154,11 @@ export default async function ResourceDetailPage({ params }: ResourcePageProps) 
               >
                 Visit {categoryLabels[resource.category]} →
               </a>
+            </section>
+
+            {/* Share Buttons */}
+            <section>
+              <ShareButtons resource={resource} resourceUrl={`${baseUrl}/resources/${id}`} />
             </section>
 
             {/* Category and Tags */}

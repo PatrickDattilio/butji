@@ -82,14 +82,30 @@ export default async function CompanyDetailPage({ params }: CompanyPageProps) {
                 <span>Back to Companies</span>
               </Link>
             </nav>
-            <h1 className="text-5xl font-bold text-red-500 mb-2 font-mono uppercase tracking-wider glitch-text" data-text={company.name}>
-              {company.name}
-            </h1>
-            {company.featured && (
-              <span className="inline-flex items-center px-2 py-1 text-xs font-bold rounded-sm bg-red-500/20 text-red-400 border border-red-500/50 font-mono uppercase terminal-glow">
-                Featured
-              </span>
-            )}
+            <div className="flex items-center gap-4 mb-4">
+              {company.logoUrl && (
+                <div className="flex-shrink-0">
+                  <img
+                    src={company.logoUrl}
+                    alt={`${company.name} logo`}
+                    className="w-16 h-16 md:w-20 md:h-20 object-contain rounded-sm border border-red-500/30 bg-cyber-darker/50 p-2"
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none'
+                    }}
+                  />
+                </div>
+              )}
+              <div className="flex-1">
+                <h1 className="text-5xl font-bold text-red-500 mb-2 font-mono uppercase tracking-wider glitch-text" data-text={company.name}>
+                  {company.name}
+                </h1>
+                {company.featured && (
+                  <span className="inline-flex items-center px-2 py-1 text-xs font-bold rounded-sm bg-red-500/20 text-red-400 border border-red-500/50 font-mono uppercase terminal-glow">
+                    Featured
+                  </span>
+                )}
+              </div>
+            </div>
           </div>
         </header>
 
