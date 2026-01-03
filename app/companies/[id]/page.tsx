@@ -89,9 +89,6 @@ export default async function CompanyDetailPage({ params }: CompanyPageProps) {
                     src={company.logoUrl}
                     alt={`${company.name} logo`}
                     className="w-16 h-16 md:w-20 md:h-20 object-contain rounded-sm border border-red-500/30 bg-cyber-darker/50 p-2"
-                    onError={(e) => {
-                      e.currentTarget.style.display = 'none'
-                    }}
                   />
                 </div>
               )}
