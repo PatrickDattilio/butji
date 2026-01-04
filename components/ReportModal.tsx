@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { ReportType } from '@/types/report'
 
 // Client-safe field names (duplicated from lib/reports.ts since that's server-only)
@@ -138,11 +139,14 @@ export default function ReportModal({ isOpen, onClose, type, targetId, targetNam
     }
   }
 
-  if (!isOpen || !mounted) return null
+  if (!isOpen) return null
+
+  if (!mounted) return null
 
   const modalContent = (
     <div 
-      className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+      className="fixed inset-0 z-[99999] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+      style={{ position: 'fixed', zIndex: 99999 }}
       onClick={(e) => {
         // Close modal when clicking the overlay
         if (e.target === e.currentTarget) {
@@ -152,6 +156,7 @@ export default function ReportModal({ isOpen, onClose, type, targetId, targetNam
     >
       <div 
         className={`relative w-full max-w-2xl ${bgClass} border ${accentClass} rounded-sm p-6 cyber-border terminal-glow`}
+        style={{ position: 'relative', zIndex: 100000 }}
         onClick={(e) => e.stopPropagation()}
       >
         <button
