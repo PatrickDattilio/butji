@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { generateBreadcrumbSchema, renderStructuredData } from '@/lib/seo'
 import { Resource } from '@/types/resource'
 import ShareButtons from '@/components/ShareButtons'
+import ReportButton from '@/components/ReportButton'
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXTAUTH_URL || 'https://butji.com'
 
@@ -116,9 +117,16 @@ export default async function ResourceDetailPage({ params }: ResourcePageProps) 
             </nav>
             <div className="flex items-start justify-between mb-4">
               <div className="flex-1">
-                <h1 className="text-4xl md:text-5xl font-bold neon-cyan mb-2 font-mono uppercase tracking-wider glitch-text" data-text={resource.title}>
-                  {resource.title}
-                </h1>
+                <div className="flex items-center gap-3 mb-2">
+                  <h1 className="text-4xl md:text-5xl font-bold neon-cyan font-mono uppercase tracking-wider glitch-text" data-text={resource.title}>
+                    {resource.title}
+                  </h1>
+                  <ReportButton
+                    type="resource"
+                    targetId={resource.id}
+                    targetName={resource.title}
+                  />
+                </div>
                 {resource.featured && (
                   <span className="inline-flex items-center px-2 py-1 text-xs font-bold rounded-sm bg-cyber-cyan/20 text-cyber-cyan border border-cyber-cyan/50 font-mono uppercase terminal-glow">
                     Featured

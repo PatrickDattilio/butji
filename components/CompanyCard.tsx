@@ -1,5 +1,8 @@
+'use client'
+
 import { Company } from '@/types/company'
 import Link from 'next/link'
+import ReportButton from './ReportButton'
 
 interface CompanyCardProps {
   company: Company
@@ -26,6 +29,13 @@ export default function CompanyCard({ company }: CompanyCardProps) {
       className="block group"
     >
       <div className="h-full p-6 bg-cyber-dark rounded-sm border border-red-500/30 cyber-border hover:border-red-500/60 hover:shadow-[0_0_20px_rgba(239,68,68,0.3)] transition-all duration-200 relative group">
+        <div className="absolute top-4 right-4 z-10" onClick={(e) => e.stopPropagation()}>
+          <ReportButton
+            type="company"
+            targetId={company.id}
+            targetName={company.name}
+          />
+        </div>
         {company.featured && (
           <div className="mb-2">
             <span className="inline-flex items-center px-2 py-1 text-xs font-bold rounded-sm bg-red-500/20 text-red-400 border border-red-500/50 font-mono uppercase terminal-glow">

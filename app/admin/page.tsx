@@ -270,6 +270,12 @@ export default function AdminPage() {
                 News Sources
               </Link>
               <Link
+                className="px-4 py-2 text-cyber-cyan hover:text-cyber-magenta transition-colors font-mono uppercase text-sm border border-cyber-cyan/40 rounded-sm hover:border-cyber-cyan/80 terminal-glow"
+                href="/admin/reports"
+              >
+                Reports
+              </Link>
+              <Link
                 className="px-4 py-2 text-red-400 hover:text-red-300 transition-colors font-mono uppercase text-sm border border-red-500/40 rounded-sm hover:border-red-500/80 terminal-glow"
                 href="/admin/company-submissions"
               >

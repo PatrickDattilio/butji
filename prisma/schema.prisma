@@ -129,4 +129,24 @@ model NewsArticle {
   @@index([source])
 }
 
+model Report {
+  id            String   @id @default(cuid())
+  type          String   // "company" or "resource"
+  targetId      String   // ID of the company or resource being reported
+  reporterEmail String?
+  field         String?  // Which field needs updating (e.g., "description", "ceo", "controversies")
+  newValue      String?  // The new/corrected information
+  source        String?  // Citation/source for the new information
+  message       String   @db.Text // Free-text message/notes
+  status        String   @default("pending") // pending, reviewed, resolved, dismissed
+  createdAt     DateTime @default(now())
+  reviewedAt    DateTime?
+  reviewedBy    String?
+  adminNotes    String?  @db.Text // Internal admin notes
+  
+  @@index([type, targetId])
+  @@index([status])
+  @@index([createdAt])
+}
+
 

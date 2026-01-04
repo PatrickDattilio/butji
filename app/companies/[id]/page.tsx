@@ -6,6 +6,7 @@ import { generateBreadcrumbSchema, renderStructuredData } from '@/lib/seo'
 import CitationLink from '@/components/CitationLink'
 import CitationList from '@/components/CitationList'
 import { Citation } from '@/types/company'
+import ReportButton from '@/components/ReportButton'
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXTAUTH_URL || 'https://butji.com'
 
@@ -127,9 +128,16 @@ export default async function CompanyDetailPage({ params }: CompanyPageProps) {
                 </div>
               )}
               <div className="flex-1">
-                <h1 className="text-5xl font-bold text-red-500 mb-2 font-mono uppercase tracking-wider glitch-text" data-text={company.name}>
-                  {company.name}
-                </h1>
+                <div className="flex items-center gap-3 mb-2">
+                  <h1 className="text-5xl font-bold text-red-500 font-mono uppercase tracking-wider glitch-text" data-text={company.name}>
+                    {company.name}
+                  </h1>
+                  <ReportButton
+                    type="company"
+                    targetId={company.id}
+                    targetName={company.name}
+                  />
+                </div>
                 {company.featured && (
                   <span className="inline-flex items-center px-2 py-1 text-xs font-bold rounded-sm bg-red-500/20 text-red-400 border border-red-500/50 font-mono uppercase terminal-glow">
                     Featured
