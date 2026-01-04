@@ -22,7 +22,11 @@ export default function ReportButton({ type, targetId, targetName, className = '
   return (
     <>
       <button
-        onClick={() => setIsModalOpen(true)}
+        onClick={(e) => {
+          e.stopPropagation()
+          e.preventDefault()
+          setIsModalOpen(true)
+        }}
         className={`inline-flex items-center gap-1 px-2 py-1 text-xs font-mono uppercase border rounded-sm transition-all ${buttonClass} ${className}`}
         title={`Report update for ${targetName}`}
       >
