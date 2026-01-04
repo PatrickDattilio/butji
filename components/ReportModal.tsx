@@ -135,8 +135,8 @@ export default function ReportModal({ isOpen, onClose, type, targetId, targetNam
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-      <div className={`relative w-full max-w-2xl ${bgClass} border ${accentClass} rounded-sm p-6 cyber-border terminal-glow`}>
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+      <div className={`relative w-full max-w-2xl ${bgClass} border ${accentClass} rounded-sm p-6 cyber-border terminal-glow z-[10000]`}>
         <button
           onClick={onClose}
           className={`absolute top-4 right-4 ${textClass} hover:opacity-70 transition-opacity font-mono text-xl`}
