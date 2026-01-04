@@ -42,6 +42,7 @@ interface ReportModalProps {
 }
 
 export default function ReportModal({ isOpen, onClose, type, targetId, targetName }: ReportModalProps) {
+  const [mounted, setMounted] = useState(false)
   const [formData, setFormData] = useState({
     field: '',
     newValue: '',
@@ -52,6 +53,11 @@ export default function ReportModal({ isOpen, onClose, type, targetId, targetNam
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitStatus, setSubmitStatus] = useState<'success' | 'error' | null>(null)
   const [errorMessage, setErrorMessage] = useState('')
+
+  useEffect(() => {
+    setMounted(true)
+    return () => setMounted(false)
+  }, [])
 
   const fieldNames = type === 'company' ? getCompanyFieldNames() : getResourceFieldNames()
   const accentColor = type === 'company' ? 'red' : 'cyan'
@@ -132,11 +138,22 @@ export default function ReportModal({ isOpen, onClose, type, targetId, targetNam
     }
   }
 
-  if (!isOpen) return null
+  if (!isOpen || !mounted) return null
 
-  return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-      <div className={`relative w-full max-w-2xl ${bgClass} border ${accentClass} rounded-sm p-6 cyber-border terminal-glow z-[10000]`}>
+  const modalContent = (
+    <div 
+      className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+      onClick={(e) => {
+        // Close modal when clicking the overlay
+        if (e.target === e.currentTarget) {
+          onClose()
+        }
+      }}
+    >
+      <div 
+        className={`relative w-full max-w-2xl ${bgClass} border ${accentClass} rounded-sm p-6 cyber-border terminal-glow`}
+        onClick={(e) => e.stopPropagation()}
+      >
         <button
           onClick={onClose}
           className={`absolute top-4 right-4 ${textClass} hover:opacity-70 transition-opacity font-mono text-xl`}
@@ -268,4 +285,6 @@ export default function ReportModal({ isOpen, onClose, type, targetId, targetNam
       </div>
     </div>
   )
+
+  return createPortal(modalContent, document.body)
 }
