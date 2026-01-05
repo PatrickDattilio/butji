@@ -17,6 +17,7 @@ export interface Company {
   tags: CompanyTag[]
   citations?: Record<string, Citation[]>
   locations?: OfficeLocation[]
+  directAction?: CampaignLink[]
   slug?: string
   featured?: boolean
   approved?: boolean
@@ -76,4 +77,13 @@ export interface OfficeLocation {
     longitude: number
   }
   notes?: string
+}
+
+export interface CampaignLink {
+  title: string
+  url: string
+  type: 'petition' | 'boycott' | 'protest' | 'organizing' | 'legal' | 'other'
+  status: 'active' | 'completed'
+  date?: string
+  description?: string
 }

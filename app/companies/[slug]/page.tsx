@@ -188,6 +188,7 @@ export default async function CompanyDetailPage({ params }: CompanyPageProps) {
               company.funding ? 'funding' : '',
               company.layoffs && company.layoffs.length > 0 ? 'layoffs' : '',
               company.controversies && Array.isArray(company.controversies) && company.controversies.length > 0 ? 'controversies' : '',
+              company.directAction && company.directAction.length > 0 ? 'direct-action' : '',
               company.locations && company.locations.length > 0 ? 'locations' : '',
               company.dataCenters && company.dataCenters.length > 0 ? 'datacenters' : '',
               'tags',
@@ -497,6 +498,77 @@ export default async function CompanyDetailPage({ params }: CompanyPageProps) {
                             />
                           </div>
                         )}
+                      </div>
+                    )
+                  })}
+                </div>
+              </section>
+            )}
+
+            {/* Direct Action */}
+            {company.directAction && company.directAction.length > 0 && (
+              <section id="direct-action">
+                <h2 className="text-2xl font-bold text-red-500 mb-4 font-mono uppercase tracking-wider">
+                  &gt; Direct Action
+                </h2>
+                <div className="space-y-3">
+                  {company.directAction.map((action, index) => {
+                    const typeColors: Record<string, string> = {
+                      petition: 'bg-red-500/20 border-red-500/40',
+                      boycott: 'bg-red-600/20 border-red-600/40',
+                      protest: 'bg-red-700/20 border-red-700/40',
+                      organizing: 'bg-red-500/20 border-red-500/40',
+                      legal: 'bg-red-600/20 border-red-600/40',
+                      other: 'bg-red-500/10 border-red-500/30',
+                    }
+                    const typeColor = typeColors[action.type] || typeColors.other
+                    
+                    return (
+                      <div
+                        key={index}
+                        className={`p-4 border rounded-sm ${typeColor}`}
+                      >
+                        <div className="flex items-start justify-between mb-2">
+                          <div className="flex-1">
+                            <a
+                              href={action.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-red-400 hover:text-red-300 font-mono font-bold text-lg transition-colors inline-block"
+                            >
+                              {action.title}
+                            </a>
+                            <span className="ml-2 px-2 py-0.5 text-xs font-bold rounded-sm bg-red-500/30 text-red-300 border border-red-500/50 font-mono uppercase">
+                              {action.type}
+                            </span>
+                            {action.status === 'active' && (
+                              <span className="ml-2 px-2 py-0.5 text-xs font-bold rounded-sm bg-green-500/20 text-green-400 border border-green-500/50 font-mono uppercase">
+                                Active
+                              </span>
+                            )}
+                            {action.status === 'completed' && (
+                              <span className="ml-2 px-2 py-0.5 text-xs font-bold rounded-sm bg-gray-500/20 text-gray-400 border border-gray-500/50 font-mono uppercase">
+                                Completed
+                              </span>
+                            )}
+                          </div>
+                          {action.date && (
+                            <time className="text-red-400/60 font-mono text-sm" dateTime={action.date}>
+                              {action.date}
+                            </time>
+                          )}
+                        </div>
+                        {action.description && (
+                          <p className="text-red-200/80 font-mono text-sm mb-2">{action.description}</p>
+                        )}
+                        <a
+                          href={action.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-red-300 hover:text-red-200 text-xs font-mono underline inline-block"
+                        >
+                          Take Action →
+                        </a>
                       </div>
                     )
                   })}

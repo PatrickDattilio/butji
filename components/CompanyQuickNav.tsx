@@ -15,6 +15,7 @@ const sections: Section[] = [
   { id: 'funding', title: 'Funding' },
   { id: 'layoffs', title: 'Layoffs' },
   { id: 'controversies', title: 'Controversies' },
+  { id: 'direct-action', title: 'Direct Action' },
   { id: 'locations', title: 'Locations' },
   { id: 'datacenters', title: 'Data Centers' },
   { id: 'tags', title: 'Tags' },
