@@ -11,7 +11,7 @@ export function getBaseUrl(): string {
   return (
     process.env.NEXT_PUBLIC_BASE_URL ||
     process.env.NEXTAUTH_URL ||
-    'https://butji.com'
+    'https://www.butji.com'
   )
 }
 
