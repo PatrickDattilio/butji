@@ -9,6 +9,7 @@ import { Citation } from '@/types/company'
 import ReportButton from '@/components/ReportButton'
 import DataCenterCard from '@/components/DataCenterCard'
 import CompanyQuickNav from '@/components/CompanyQuickNav'
+import CompanyLogo from '@/components/CompanyLogo'
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXTAUTH_URL || 'https://butji.com'
 
@@ -148,13 +149,10 @@ export default async function CompanyDetailPage({ params }: CompanyPageProps) {
             </nav>
             <div className="flex items-center gap-4 mb-4">
               {company.logoUrl && (
-                <div className="flex-shrink-0">
-                  <img
-                    src={company.logoUrl}
-                    alt={`${company.name} logo`}
-                    className="w-16 h-16 md:w-20 md:h-20 object-contain rounded-sm border border-red-500/30 bg-cyber-darker/50 p-2"
-                  />
-                </div>
+                <CompanyLogo
+                  logoUrl={company.logoUrl}
+                  companyName={company.name}
+                />
               )}
               <div className="flex-1">
                 <div className="flex items-center gap-3 mb-2">
