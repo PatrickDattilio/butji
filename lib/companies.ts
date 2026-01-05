@@ -81,6 +81,13 @@ export async function getCompanyById(id: string): Promise<Company | null> {
       include: {
         ownedDataCenters: {
           include: {
+            owner: {
+              select: {
+                id: true,
+                name: true,
+                slug: true,
+              },
+            },
             users: {
               include: {
                 company: {
@@ -206,6 +213,13 @@ export async function getCompanyBySlug(slug: string): Promise<Company | null> {
       include: {
         ownedDataCenters: {
           include: {
+            owner: {
+              select: {
+                id: true,
+                name: true,
+                slug: true,
+              },
+            },
             users: {
               include: {
                 company: {
