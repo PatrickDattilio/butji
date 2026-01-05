@@ -16,6 +16,7 @@ export interface Company {
   layoffs?: LayoffInfo[]
   tags: CompanyTag[]
   citations?: Record<string, Citation[]>
+  locations?: OfficeLocation[]
   slug?: string
   featured?: boolean
   approved?: boolean
@@ -62,4 +63,17 @@ export interface Citation {
   url: string
   title?: string
   date?: string
+}
+
+export interface OfficeLocation {
+  type: 'headquarters' | 'office' | 'data-center' | 'other'
+  address?: string
+  city?: string
+  state?: string
+  country: string
+  coordinates?: {
+    latitude: number
+    longitude: number
+  }
+  notes?: string
 }

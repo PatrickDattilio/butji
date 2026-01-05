@@ -80,6 +80,23 @@ export default function CompanyCard({ company }: CompanyCardProps) {
               Valuation: {company.valuation}
             </p>
           )}
+          {company.locations && company.locations.length > 0 && (
+            <div className="text-xs text-red-400/60 font-mono">
+              <p className="mb-1">Locations:</p>
+              {company.locations
+                .filter(loc => loc.type === 'headquarters')
+                .map((loc, idx) => (
+                  <p key={idx} className="pl-2">
+                    HQ: {[loc.city, loc.state, loc.country].filter(Boolean).join(', ')}
+                  </p>
+                ))}
+              {company.locations.filter(loc => loc.type === 'office').length > 0 && (
+                <p className="pl-2 text-red-400/50">
+                  +{company.locations.filter(loc => loc.type === 'office').length} office(s)
+                </p>
+              )}
+            </div>
+          )}
         </div>
         <div className="flex flex-wrap items-center gap-2">
           {company.tags.map((tag) => (

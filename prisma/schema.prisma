@@ -63,6 +63,7 @@ model Company {
   layoffs       String?  // JSON array stored as string
   tags          String   // JSON array stored as string
   citations     String?  // JSON object stored as string: { "fieldName": [{ url, title?, date? }] }
+  locations     String?  // JSON array stored as string: [{ type, address, city, state, country, coordinates?, notes? }]
   slug          String?  @unique
   featured      Boolean  @default(false)
   approved      Boolean  @default(true)
@@ -93,6 +94,7 @@ model CompanySubmission {
   layoffs         String?  // JSON array stored as string
   tags            String   // JSON array stored as string
   citations       String?  // JSON object stored as string: { "fieldName": [{ url, title?, date? }] }
+  locations       String?  // JSON array stored as string: [{ type, address, city, state, country, coordinates?, notes? }]
   status          String   @default("pending") // pending, approved, rejected
   featured        Boolean  @default(false)
   submittedAt     DateTime @default(now())

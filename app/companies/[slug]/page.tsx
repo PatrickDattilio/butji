@@ -486,6 +486,55 @@ export default async function CompanyDetailPage({ params }: CompanyPageProps) {
               </section>
             )}
 
+            {/* Office Locations */}
+            {company.locations && company.locations.length > 0 && (
+              <section>
+                <h2 className="text-2xl font-bold text-red-500 mb-4 font-mono uppercase tracking-wider">
+                  &gt; Office Locations
+                </h2>
+                <div className="space-y-3">
+                  {company.locations.map((location, index) => {
+                    const locationParts = [
+                      location.address,
+                      location.city,
+                      location.state,
+                      location.country,
+                    ].filter(Boolean)
+                    const locationString = locationParts.join(', ')
+                    
+                    return (
+                      <div
+                        key={index}
+                        className="p-4 bg-cyber-dark border border-red-500/30 rounded-sm"
+                      >
+                        <div className="flex items-start justify-between mb-2">
+                          <span className="px-2 py-1 text-xs font-bold rounded-sm bg-red-500/20 text-red-400 border border-red-500/50 font-mono uppercase">
+                            {location.type === 'headquarters' ? 'HQ' : location.type.replace('-', ' ')}
+                          </span>
+                          {location.coordinates && (
+                            <a
+                              href={`https://www.google.com/maps?q=${location.coordinates.latitude},${location.coordinates.longitude}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-red-300 hover:text-red-200 text-xs font-mono underline"
+                            >
+                              Map
+                            </a>
+                          )}
+                        </div>
+                        <p className="text-red-400/90 font-mono">
+                          {locationString || location.country}
+                        </p>
+                        {location.notes && (
+                          <p className="text-red-400/60 font-mono text-sm mt-1">{location.notes}</p>
+                        )}
+                      </div>
+                    )
+                  })}
+                </div>
+              </section>
+            )}
+
             {/* Data Centers */}
             {company.dataCenters && company.dataCenters.length > 0 && (
               <section>
