@@ -2,6 +2,9 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import ButjiBadge from '@/components/ButjiBadge'
 
+// ISR: Revalidate every hour (3600 seconds)
+export const revalidate = 3600
+
 export const metadata: Metadata = {
   title: 'Get Butji Badge - Butlerian Jihad',
   description: 'Add a Butlerian Jihad badge to your website. Show your support for human creativity and resistance against the machines.',

@@ -9,6 +9,9 @@ import ReportButton from '@/components/ReportButton'
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXTAUTH_URL || 'https://butji.com'
 
+// ISR: Revalidate every hour (3600 seconds)
+export const revalidate = 3600
+
 interface ResourcePageProps {
   params: Promise<{ slug: string }>
 }

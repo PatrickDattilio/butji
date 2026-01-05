@@ -4,6 +4,9 @@ import { generateArticleSchema, generateBreadcrumbSchema, renderStructuredData }
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXTAUTH_URL || 'https://butji.com'
 
+// ISR: Revalidate every hour (3600 seconds)
+export const revalidate = 3600
+
 export const metadata: Metadata = {
   title: 'The Manifesto - Butji.com | A Declaration Against the Machines',
   description: 'A declaration of war against the machines and their masters. Read the Butlerian Jihad manifesto - our principles, our call to arms, and our refusal to be replaced.',

@@ -6,6 +6,9 @@ import { generateCollectionPageSchema, generateBreadcrumbSchema, renderStructure
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXTAUTH_URL || 'https://butji.com'
 
+// ISR: Revalidate every hour (3600 seconds)
+export const revalidate = 3600
+
 export const metadata: Metadata = {
   title: 'AI News Feed - Butji.com | Latest Headlines on AI & Tech',
   description: 'Latest headlines about AI companies, layoffs, and industry news. Stay informed about the machines and their impact on workers.',
