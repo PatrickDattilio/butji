@@ -2,6 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Smooth scroll behavior */
+html {
+  scroll-behavior: smooth;
+}
+
 :root {
   --background: #0a0a0a;
   --foreground: #d4d4d4;
@@ -213,6 +218,16 @@ body::before {
       0 0 5px rgba(0, 255, 255, 0.5),
       0 0 10px rgba(0, 255, 255, 0.3),
       inset 0 0 10px rgba(0, 255, 255, 0.1);
+  }
+  
+  /* Hide scrollbar for horizontal nav on mobile */
+  .scrollbar-hide {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;  /* Chrome, Safari and Opera */
   }
 }
 

@@ -8,6 +8,7 @@ import CitationList from '@/components/CitationList'
 import { Citation } from '@/types/company'
 import ReportButton from '@/components/ReportButton'
 import DataCenterCard from '@/components/DataCenterCard'
+import CompanyQuickNav from '@/components/CompanyQuickNav'
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXTAUTH_URL || 'https://butji.com'
 
@@ -176,10 +177,27 @@ export default async function CompanyDetailPage({ params }: CompanyPageProps) {
           </div>
         </header>
 
-        <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 relative z-10">
-          <article className="bg-cyber-dark rounded-sm border border-red-500/30 cyber-border p-8 terminal-glow space-y-6">
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 relative z-10">
+          {/* Quick Navigation - Desktop Sidebar (fixed, outside flex container) */}
+          <CompanyQuickNav
+            availableSections={[
+              'about',
+              company.website || company.ceo || company.foundedYear || company.valuation ? 'basic-info' : '',
+              company.founders.length > 0 ? 'founders' : '',
+              company.products.length > 0 ? 'products' : '',
+              company.funding ? 'funding' : '',
+              company.layoffs && company.layoffs.length > 0 ? 'layoffs' : '',
+              company.controversies && Array.isArray(company.controversies) && company.controversies.length > 0 ? 'controversies' : '',
+              company.locations && company.locations.length > 0 ? 'locations' : '',
+              company.dataCenters && company.dataCenters.length > 0 ? 'datacenters' : '',
+              'tags',
+            ].filter(Boolean) as string[]}
+          />
+          
+          {/* Main Content with left margin for sidebar */}
+          <article className="bg-cyber-dark rounded-sm border border-red-500/30 cyber-border p-8 terminal-glow space-y-6 max-w-4xl lg:ml-56">
             {/* Description */}
-            <section>
+            <section id="about">
               <h2 className="text-2xl font-bold text-red-500 mb-4 font-mono uppercase tracking-wider">
                 &gt; About
               </h2>
@@ -201,7 +219,7 @@ export default async function CompanyDetailPage({ params }: CompanyPageProps) {
             </section>
 
             {/* Basic Info */}
-            <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <section id="basic-info" className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {company.website && (
                 <div>
                   <h3 className="text-sm font-bold text-red-400/60 mb-1 font-mono uppercase">Website</h3>
@@ -279,7 +297,7 @@ export default async function CompanyDetailPage({ params }: CompanyPageProps) {
 
             {/* Founders */}
             {company.founders.length > 0 && (
-              <section>
+              <section id="founders">
                 <h2 className="text-2xl font-bold text-red-500 mb-4 font-mono uppercase tracking-wider">
                   &gt; Founders
                 </h2>
@@ -310,7 +328,7 @@ export default async function CompanyDetailPage({ params }: CompanyPageProps) {
 
             {/* Products */}
             {company.products.length > 0 && (
-              <section>
+              <section id="products">
                 <h2 className="text-2xl font-bold text-red-500 mb-4 font-mono uppercase tracking-wider">
                   &gt; Products & Services
                 </h2>
@@ -341,7 +359,7 @@ export default async function CompanyDetailPage({ params }: CompanyPageProps) {
 
             {/* Funding */}
             {company.funding && (
-              <section>
+              <section id="funding">
                 <h2 className="text-2xl font-bold text-red-500 mb-4 font-mono uppercase tracking-wider">
                   &gt; Funding
                 </h2>
@@ -397,7 +415,7 @@ export default async function CompanyDetailPage({ params }: CompanyPageProps) {
 
             {/* Layoffs */}
             {company.layoffs && company.layoffs.length > 0 && (
-              <section>
+              <section id="layoffs">
                 <h2 className="text-2xl font-bold text-red-400 mb-4 font-mono uppercase tracking-wider">
                   &gt; Layoffs
                 </h2>
@@ -438,7 +456,7 @@ export default async function CompanyDetailPage({ params }: CompanyPageProps) {
 
             {/* Controversies */}
             {company.controversies && Array.isArray(company.controversies) && company.controversies.length > 0 && (
-              <section>
+              <section id="controversies">
                 <h2 className="text-2xl font-bold text-red-400 mb-4 font-mono uppercase tracking-wider">
                   &gt; Controversies
                 </h2>
@@ -488,7 +506,7 @@ export default async function CompanyDetailPage({ params }: CompanyPageProps) {
 
             {/* Office Locations */}
             {company.locations && company.locations.length > 0 && (
-              <section>
+              <section id="locations">
                 <h2 className="text-2xl font-bold text-red-500 mb-4 font-mono uppercase tracking-wider">
                   &gt; Office Locations
                 </h2>
@@ -537,7 +555,7 @@ export default async function CompanyDetailPage({ params }: CompanyPageProps) {
 
             {/* Data Centers */}
             {company.dataCenters && company.dataCenters.length > 0 && (
-              <section>
+              <section id="datacenters">
                 <h2 className="text-2xl font-bold text-red-500 mb-4 font-mono uppercase tracking-wider">
                   &gt; Data Centers
                 </h2>
@@ -559,7 +577,7 @@ export default async function CompanyDetailPage({ params }: CompanyPageProps) {
             )}
 
             {/* Tags */}
-            <section>
+            <section id="tags">
               <h2 className="text-2xl font-bold text-red-500 mb-4 font-mono uppercase tracking-wider">
                 &gt; Tags
               </h2>
