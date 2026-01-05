@@ -65,6 +65,10 @@ model Company {
   citations     String?  // JSON object stored as string: { "fieldName": [{ url, title?, date? }] }
   locations     String?  // JSON array stored as string: [{ type, address, city, state, country, coordinates?, notes? }]
   directAction  String?  // JSON array stored as string: [{ title, url, type, status, date? }]
+  unionInfo     String?  // JSON object stored as string: { status, union?, organizingEfforts[], laborViolations[] }
+  employeeCount Int?     // Current headcount
+  socialMedia   String?  // JSON object stored as string: { twitter, linkedin, facebook, instagram, youtube, tiktok? }
+  contactInfo   String?  // JSON object stored as string: { email, pressEmail, investorRelations, phone, address?, notes? }
   slug          String?  @unique
   featured      Boolean  @default(false)
   approved      Boolean  @default(true)
@@ -97,6 +101,10 @@ model CompanySubmission {
   citations       String?  // JSON object stored as string: { "fieldName": [{ url, title?, date? }] }
   locations       String?  // JSON array stored as string: [{ type, address, city, state, country, coordinates?, notes? }]
   directAction    String?  // JSON array stored as string: [{ title, url, type, status, date? }]
+  unionInfo       String?  // JSON object stored as string: { status, union?, organizingEfforts[], laborViolations[] }
+  employeeCount   Int?     // Current headcount
+  socialMedia     String?  // JSON object stored as string: { twitter, linkedin, facebook, instagram, youtube, tiktok? }
+  contactInfo     String?  // JSON object stored as string: { email, pressEmail, investorRelations, phone, address?, notes? }
   status          String   @default("pending") // pending, approved, rejected
   featured        Boolean  @default(false)
   submittedAt     DateTime @default(now())

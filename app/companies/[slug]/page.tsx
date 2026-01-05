@@ -183,12 +183,15 @@ export default async function CompanyDetailPage({ params }: CompanyPageProps) {
             availableSections={[
               'about',
               company.website || company.ceo || company.foundedYear || company.valuation ? 'basic-info' : '',
+              company.socialMedia ? 'social-media' : '',
+              company.contactInfo ? 'contact-info' : '',
               company.founders.length > 0 ? 'founders' : '',
               company.products.length > 0 ? 'products' : '',
               company.funding ? 'funding' : '',
               company.layoffs && company.layoffs.length > 0 ? 'layoffs' : '',
               company.controversies && Array.isArray(company.controversies) && company.controversies.length > 0 ? 'controversies' : '',
               company.directAction && company.directAction.length > 0 ? 'direct-action' : '',
+              (company.unionInfo || company.employeeCount) ? 'union-labor' : '',
               company.locations && company.locations.length > 0 ? 'locations' : '',
               company.dataCenters && company.dataCenters.length > 0 ? 'datacenters' : '',
               'tags',
@@ -295,6 +298,177 @@ export default async function CompanyDetailPage({ params }: CompanyPageProps) {
                 </div>
               )}
             </section>
+
+            {/* Social Media */}
+            {company.socialMedia && (
+              <section id="social-media">
+                <h2 className="text-2xl font-bold text-red-500 mb-4 font-mono uppercase tracking-wider">
+                  &gt; Social Media
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {company.socialMedia.twitter && (
+                    <div>
+                      <h3 className="text-sm font-bold text-red-400/60 mb-1 font-mono uppercase">Twitter/X</h3>
+                      <a
+                        href={`https://twitter.com/${company.socialMedia.twitter.replace('@', '')}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-red-400 hover:text-red-300 transition-colors font-mono"
+                      >
+                        @{company.socialMedia.twitter.replace('@', '')}
+                      </a>
+                    </div>
+                  )}
+                  {company.socialMedia.linkedin && (
+                    <div>
+                      <h3 className="text-sm font-bold text-red-400/60 mb-1 font-mono uppercase">LinkedIn</h3>
+                      <a
+                        href={company.socialMedia.linkedin}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-red-400 hover:text-red-300 transition-colors font-mono break-all"
+                      >
+                        {company.socialMedia.linkedin}
+                      </a>
+                    </div>
+                  )}
+                  {company.socialMedia.facebook && (
+                    <div>
+                      <h3 className="text-sm font-bold text-red-400/60 mb-1 font-mono uppercase">Facebook</h3>
+                      <a
+                        href={company.socialMedia.facebook}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-red-400 hover:text-red-300 transition-colors font-mono break-all"
+                      >
+                        {company.socialMedia.facebook}
+                      </a>
+                    </div>
+                  )}
+                  {company.socialMedia.instagram && (
+                    <div>
+                      <h3 className="text-sm font-bold text-red-400/60 mb-1 font-mono uppercase">Instagram</h3>
+                      <a
+                        href={`https://instagram.com/${company.socialMedia.instagram.replace('@', '')}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-red-400 hover:text-red-300 transition-colors font-mono"
+                      >
+                        @{company.socialMedia.instagram.replace('@', '')}
+                      </a>
+                    </div>
+                  )}
+                  {company.socialMedia.youtube && (
+                    <div>
+                      <h3 className="text-sm font-bold text-red-400/60 mb-1 font-mono uppercase">YouTube</h3>
+                      <a
+                        href={company.socialMedia.youtube}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-red-400 hover:text-red-300 transition-colors font-mono break-all"
+                      >
+                        {company.socialMedia.youtube}
+                      </a>
+                    </div>
+                  )}
+                  {company.socialMedia.tiktok && (
+                    <div>
+                      <h3 className="text-sm font-bold text-red-400/60 mb-1 font-mono uppercase">TikTok</h3>
+                      <a
+                        href={`https://tiktok.com/@${company.socialMedia.tiktok.replace('@', '')}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-red-400 hover:text-red-300 transition-colors font-mono"
+                      >
+                        @{company.socialMedia.tiktok.replace('@', '')}
+                      </a>
+                    </div>
+                  )}
+                </div>
+              </section>
+            )}
+
+            {/* Contact Information */}
+            {company.contactInfo && (
+              <section id="contact-info">
+                <h2 className="text-2xl font-bold text-red-500 mb-4 font-mono uppercase tracking-wider">
+                  &gt; Contact Information
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {company.contactInfo.email && (
+                    <div>
+                      <h3 className="text-sm font-bold text-red-400/60 mb-1 font-mono uppercase">Email</h3>
+                      <a
+                        href={`mailto:${company.contactInfo.email}`}
+                        className="text-red-400 hover:text-red-300 transition-colors font-mono break-all"
+                      >
+                        {company.contactInfo.email}
+                      </a>
+                    </div>
+                  )}
+                  {company.contactInfo.pressEmail && (
+                    <div>
+                      <h3 className="text-sm font-bold text-red-400/60 mb-1 font-mono uppercase">Press/Media</h3>
+                      <a
+                        href={`mailto:${company.contactInfo.pressEmail}`}
+                        className="text-red-400 hover:text-red-300 transition-colors font-mono break-all"
+                      >
+                        {company.contactInfo.pressEmail}
+                      </a>
+                    </div>
+                  )}
+                  {company.contactInfo.investorRelations && (
+                    <div>
+                      <h3 className="text-sm font-bold text-red-400/60 mb-1 font-mono uppercase">Investor Relations</h3>
+                      {company.contactInfo.investorRelations.includes('@') ? (
+                        <a
+                          href={`mailto:${company.contactInfo.investorRelations}`}
+                          className="text-red-400 hover:text-red-300 transition-colors font-mono break-all"
+                        >
+                          {company.contactInfo.investorRelations}
+                        </a>
+                      ) : (
+                        <a
+                          href={company.contactInfo.investorRelations}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-red-400 hover:text-red-300 transition-colors font-mono break-all"
+                        >
+                          {company.contactInfo.investorRelations}
+                        </a>
+                      )}
+                    </div>
+                  )}
+                  {company.contactInfo.phone && (
+                    <div>
+                      <h3 className="text-sm font-bold text-red-400/60 mb-1 font-mono uppercase">Phone</h3>
+                      <a
+                        href={`tel:${company.contactInfo.phone.replace(/\s/g, '')}`}
+                        className="text-red-400 hover:text-red-300 transition-colors font-mono"
+                      >
+                        {company.contactInfo.phone}
+                      </a>
+                    </div>
+                  )}
+                  {company.contactInfo.address && (
+                    <div className="md:col-span-2">
+                      <h3 className="text-sm font-bold text-red-400/60 mb-1 font-mono uppercase">Mailing Address</h3>
+                      <p className="text-red-400/90 font-mono">
+                        {company.contactInfo.address}
+                      </p>
+                    </div>
+                  )}
+                  {company.contactInfo.notes && (
+                    <div className="md:col-span-2">
+                      <h3 className="text-sm font-bold text-red-400/60 mb-1 font-mono uppercase">Notes</h3>
+                      <p className="text-red-400/90 font-mono text-sm">
+                        {company.contactInfo.notes}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </section>
+            )}
 
             {/* Founders */}
             {company.founders.length > 0 && (
@@ -572,6 +746,187 @@ export default async function CompanyDetailPage({ params }: CompanyPageProps) {
                       </div>
                     )
                   })}
+                </div>
+              </section>
+            )}
+
+            {/* Union & Labor */}
+            {(company.unionInfo || company.employeeCount) && (
+              <section id="union-labor">
+                <h2 className="text-2xl font-bold text-red-500 mb-4 font-mono uppercase tracking-wider">
+                  &gt; Union & Labor
+                </h2>
+                <div className="space-y-4">
+                  {/* Employee Count */}
+                  {company.employeeCount && (
+                    <div className="p-4 bg-cyber-dark border border-red-500/30 rounded-sm">
+                      <h3 className="text-sm font-bold text-red-400/60 mb-2 font-mono uppercase">Employee Count</h3>
+                      <p className="text-red-400/90 font-mono text-lg font-bold">
+                        {company.employeeCount.toLocaleString()} employees
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Union Status */}
+                  {company.unionInfo && (
+                    <div className="space-y-4">
+                      {/* Union Status Badge */}
+                      <div className="p-4 bg-cyber-dark border border-red-500/30 rounded-sm">
+                        <h3 className="text-sm font-bold text-red-400/60 mb-2 font-mono uppercase">Union Status</h3>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className={`px-3 py-1 text-sm font-bold rounded-sm font-mono uppercase ${
+                            company.unionInfo.status === 'unionized' 
+                              ? 'bg-green-500/20 text-green-400 border border-green-500/50'
+                              : company.unionInfo.status === 'organizing'
+                              ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/50'
+                              : company.unionInfo.status === 'non-union'
+                              ? 'bg-red-500/20 text-red-400 border border-red-500/50'
+                              : 'bg-gray-500/20 text-gray-400 border border-gray-500/50'
+                          }`}>
+                            {company.unionInfo.status === 'unionized' ? '✓ Unionized' :
+                             company.unionInfo.status === 'organizing' ? '⚡ Organizing' :
+                             company.unionInfo.status === 'non-union' ? '✗ Non-Union' :
+                             'Unknown'}
+                          </span>
+                        </div>
+                        {company.unionInfo.union && (
+                          <div className="mt-3">
+                            <p className="text-red-400/90 font-mono font-bold">
+                              {company.unionInfo.union.name}
+                            </p>
+                            {company.unionInfo.union.description && (
+                              <p className="text-red-300/70 font-mono text-sm mt-1">
+                                {company.unionInfo.union.description}
+                              </p>
+                            )}
+                            {company.unionInfo.union.url && (
+                              <a
+                                href={company.unionInfo.union.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-red-400 hover:text-red-300 text-sm font-mono underline mt-2 inline-block"
+                              >
+                                Visit Union Website →
+                              </a>
+                            )}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Organizing Efforts */}
+                      {company.unionInfo.organizingEfforts && company.unionInfo.organizingEfforts.length > 0 && (
+                        <div className="p-4 bg-cyber-dark border border-red-500/30 rounded-sm">
+                          <h3 className="text-sm font-bold text-red-400/60 mb-3 font-mono uppercase">Organizing Efforts</h3>
+                          <div className="space-y-3">
+                            {company.unionInfo.organizingEfforts.map((effort, index) => (
+                              <div key={index} className="border-l-2 border-red-500/50 pl-3">
+                                <div className="flex items-start justify-between mb-1">
+                                  <div className="flex-1">
+                                    <p className="text-red-400/90 font-mono font-bold">{effort.description}</p>
+                                    {effort.union && (
+                                      <p className="text-red-300/70 font-mono text-sm mt-1">Union: {effort.union}</p>
+                                    )}
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    {effort.date && (
+                                      <time className="text-red-400/60 font-mono text-xs" dateTime={effort.date}>
+                                        {effort.date}
+                                      </time>
+                                    )}
+                                    <span className={`px-2 py-0.5 text-xs font-bold rounded-sm font-mono uppercase ${
+                                      effort.status === 'active'
+                                        ? 'bg-green-500/20 text-green-400 border border-green-500/50'
+                                        : effort.status === 'completed'
+                                        ? 'bg-blue-500/20 text-blue-400 border border-blue-500/50'
+                                        : 'bg-gray-500/20 text-gray-400 border border-gray-500/50'
+                                    }`}>
+                                      {effort.status}
+                                    </span>
+                                  </div>
+                                </div>
+                                {effort.url && (
+                                  <a
+                                    href={effort.url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-red-400 hover:text-red-300 text-xs font-mono underline mt-1 inline-block"
+                                  >
+                                    Learn More →
+                                  </a>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Labor Violations */}
+                      {company.unionInfo.laborViolations && company.unionInfo.laborViolations.length > 0 && (
+                        <div className="p-4 bg-cyber-dark border border-red-500/30 rounded-sm">
+                          <h3 className="text-sm font-bold text-red-400/60 mb-3 font-mono uppercase">Labor Violations</h3>
+                          <div className="space-y-3">
+                            {company.unionInfo.laborViolations.map((violation, index) => {
+                              const violationTypeColors: Record<string, string> = {
+                                'strike': 'bg-red-600/20 border-red-600/40',
+                                'walkout': 'bg-red-500/20 border-red-500/40',
+                                'unfair-labor-practice': 'bg-orange-500/20 border-orange-500/40',
+                                'wage-theft': 'bg-yellow-500/20 border-yellow-500/40',
+                                'safety-violation': 'bg-red-700/20 border-red-700/40',
+                                'discrimination': 'bg-purple-500/20 border-purple-500/40',
+                                'retaliation': 'bg-red-600/20 border-red-600/40',
+                                'other': 'bg-red-500/10 border-red-500/30',
+                              }
+                              const typeColor = violationTypeColors[violation.type] || violationTypeColors.other
+                              
+                              return (
+                                <div key={index} className={`p-3 border rounded-sm ${typeColor}`}>
+                                  <div className="flex items-start justify-between mb-2">
+                                    <div className="flex-1">
+                                      <span className="px-2 py-0.5 text-xs font-bold rounded-sm bg-red-500/30 text-red-300 border border-red-500/50 font-mono uppercase mr-2">
+                                        {violation.type.replace('-', ' ')}
+                                      </span>
+                                      {violation.agency && (
+                                        <span className="text-red-300/70 font-mono text-xs">
+                                          {violation.agency}
+                                        </span>
+                                      )}
+                                    </div>
+                                    {violation.date && (
+                                      <time className="text-red-400/60 font-mono text-xs" dateTime={violation.date}>
+                                        {violation.date}
+                                      </time>
+                                    )}
+                                  </div>
+                                  <p className="text-red-200/80 font-mono text-sm mb-2">{violation.description}</p>
+                                  {violation.status && (
+                                    <span className={`inline-block px-2 py-0.5 text-xs font-bold rounded-sm font-mono uppercase mr-2 ${
+                                      violation.status === 'pending'
+                                        ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/50'
+                                        : violation.status === 'resolved'
+                                        ? 'bg-green-500/20 text-green-400 border border-green-500/50'
+                                        : 'bg-blue-500/20 text-blue-400 border border-blue-500/50'
+                                    }`}>
+                                      {violation.status}
+                                    </span>
+                                  )}
+                                  {violation.url && (
+                                    <a
+                                      href={violation.url}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="text-red-300 hover:text-red-200 text-xs font-mono underline inline-block"
+                                    >
+                                      View Details →
+                                    </a>
+                                  )}
+                                </div>
+                              )
+                            })}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               </section>
             )}
