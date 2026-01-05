@@ -741,7 +741,7 @@ export default function AdminCompaniesPage() {
                     Delete
                   </button>
                   <Link
-                    href={`/companies/${company.id}`}
+                    href={`/companies/${company.slug || company.id}`}
                     className="px-4 py-2 bg-cyber-dark border border-red-500/40 text-red-400 rounded-sm hover:bg-red-500/10 transition-colors font-mono font-bold uppercase text-sm"
                   >
                     View

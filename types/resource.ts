@@ -24,6 +24,7 @@ export interface Resource {
   url: string
   category: ResourceCategory
   tags: ResourceTag[]
+  slug?: string
   featured?: boolean
   approved?: boolean
   submittedAt?: string

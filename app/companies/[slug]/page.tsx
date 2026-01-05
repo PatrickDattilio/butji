@@ -1,28 +1,44 @@
 import type { Metadata } from 'next'
-import { notFound } from 'next/navigation'
-import { getCompanyById } from '@/lib/companies'
+import { notFound, redirect } from 'next/navigation'
+import { getCompanyBySlug, getCompanyById } from '@/lib/companies'
 import Link from 'next/link'
 import { generateBreadcrumbSchema, renderStructuredData } from '@/lib/seo'
 import CitationLink from '@/components/CitationLink'
 import CitationList from '@/components/CitationList'
 import { Citation } from '@/types/company'
 import ReportButton from '@/components/ReportButton'
+import DataCenterCard from '@/components/DataCenterCard'
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXTAUTH_URL || 'https://butji.com'
 
 interface CompanyPageProps {
-  params: Promise<{ id: string }>
+  params: Promise<{ slug: string }>
+}
+
+// Helper to check if a string looks like a CUID (typically starts with 'c' and is 25 chars)
+function looksLikeId(str: string): boolean {
+  return str.length === 25 && str.match(/^c[a-z0-9]+$/) !== null
 }
 
 export async function generateMetadata({ params }: CompanyPageProps): Promise<Metadata> {
-  const { id } = await params
-  const company = await getCompanyById(id)
+  const { slug } = await params
+  
+  // Try to find by slug first, then by ID (for backward compatibility)
+  let company = await getCompanyBySlug(slug)
+  if (!company && looksLikeId(slug)) {
+    company = await getCompanyById(slug)
+  }
   
   if (!company) {
     return {
       title: 'Company Not Found - Butji.com',
     }
   }
+
+  // If found by ID but has slug, redirect to slug URL in component
+  // For metadata, use the slug URL if available
+  const urlPath = company.slug || slug
+  const url = `${baseUrl}/companies/${urlPath}`
 
   return {
     title: `${company.name} - AI Company Database | Butji.com`,
@@ -31,7 +47,7 @@ export async function generateMetadata({ params }: CompanyPageProps): Promise<Me
     openGraph: {
       title: `${company.name} - AI Company Database`,
       description: company.description.substring(0, 160),
-      url: `${baseUrl}/companies/${id}`,
+      url,
       type: 'article',
     },
     twitter: {
@@ -40,23 +56,35 @@ export async function generateMetadata({ params }: CompanyPageProps): Promise<Me
       description: company.description.substring(0, 160),
     },
     alternates: {
-      canonical: `${baseUrl}/companies/${id}`,
+      canonical: url,
     },
   }
 }
 
 export default async function CompanyDetailPage({ params }: CompanyPageProps) {
-  const { id } = await params
-  const company = await getCompanyById(id)
+  const { slug } = await params
+  
+  // Try to find by slug first, then by ID (for backward compatibility)
+  let company = await getCompanyBySlug(slug)
+  if (!company && looksLikeId(slug)) {
+    company = await getCompanyById(slug)
+    // If found by ID but has slug, redirect to slug URL
+    if (company && company.slug) {
+      redirect(`/companies/${company.slug}`)
+    }
+  }
 
   if (!company) {
     notFound()
   }
 
+  const urlPath = company.slug || slug
+  const companyUrl = `${baseUrl}/companies/${urlPath}`
+
   const breadcrumbSchema = generateBreadcrumbSchema([
     { name: 'Home', url: baseUrl },
     { name: 'Companies', url: `${baseUrl}/companies` },
-    { name: company.name, url: `${baseUrl}/companies/${id}` },
+    { name: company.name, url: companyUrl },
   ])
 
   // Calculate citation numbers for each field
@@ -452,6 +480,29 @@ export default async function CompanyDetailPage({ params }: CompanyPageProps) {
                           </div>
                         )}
                       </div>
+                    )
+                  })}
+                </div>
+              </section>
+            )}
+
+            {/* Data Centers */}
+            {company.dataCenters && company.dataCenters.length > 0 && (
+              <section>
+                <h2 className="text-2xl font-bold text-red-500 mb-4 font-mono uppercase tracking-wider">
+                  &gt; Data Centers
+                </h2>
+                <div className="space-y-4">
+                  {company.dataCenters.map((dataCenter) => {
+                    // Check if this company owns this data center
+                    const isOwner = dataCenter.owner?.id === company.id
+                    return (
+                      <DataCenterCard
+                        key={dataCenter.id}
+                        dataCenter={dataCenter}
+                        isOwner={isOwner}
+                        userConfidence={dataCenter.userConfidence}
+                      />
                     )
                   })}
                 </div>

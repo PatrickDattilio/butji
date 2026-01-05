@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
-import { notFound } from 'next/navigation'
-import { getResourceById, getApprovedResources } from '@/lib/resources'
+import { notFound, redirect } from 'next/navigation'
+import { getResourceBySlug, getResourceById, getApprovedResources } from '@/lib/resources'
 import Link from 'next/link'
 import { generateBreadcrumbSchema, renderStructuredData } from '@/lib/seo'
 import { Resource } from '@/types/resource'
@@ -10,18 +10,33 @@ import ReportButton from '@/components/ReportButton'
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXTAUTH_URL || 'https://butji.com'
 
 interface ResourcePageProps {
-  params: Promise<{ id: string }>
+  params: Promise<{ slug: string }>
+}
+
+// Helper to check if a string looks like a CUID (typically starts with 'c' and is 25 chars)
+function looksLikeId(str: string): boolean {
+  return str.length === 25 && str.match(/^c[a-z0-9]+$/) !== null
 }
 
 export async function generateMetadata({ params }: ResourcePageProps): Promise<Metadata> {
-  const { id } = await params
-  const resource = await getResourceById(id)
+  const { slug } = await params
+  
+  // Try to find by slug first, then by ID (for backward compatibility)
+  let resource = await getResourceBySlug(slug)
+  if (!resource && looksLikeId(slug)) {
+    resource = await getResourceById(slug)
+  }
   
   if (!resource) {
     return {
       title: 'Resource Not Found - Butji.com',
     }
   }
+
+  // If found by ID but has slug, redirect to slug URL in component
+  // For metadata, use the slug URL if available
+  const urlPath = resource.slug || slug
+  const url = `${baseUrl}/resources/${urlPath}`
 
   return {
     title: `${resource.title} - Anti-AI Resource | Butji.com`,
@@ -30,7 +45,7 @@ export async function generateMetadata({ params }: ResourcePageProps): Promise<M
     openGraph: {
       title: resource.title,
       description: resource.description.substring(0, 160),
-      url: `${baseUrl}/resources/${id}`,
+      url,
       type: 'article',
     },
     twitter: {
@@ -39,16 +54,20 @@ export async function generateMetadata({ params }: ResourcePageProps): Promise<M
       description: resource.description.substring(0, 160),
     },
     alternates: {
-      canonical: `${baseUrl}/resources/${id}`,
+      canonical: url,
     },
   }
 }
 
 export async function generateStaticParams() {
   const resources = await getApprovedResources()
-  return resources.slice(0, 100).map((resource) => ({
-    id: resource.id,
-  }))
+  // Only generate static params for resources with slugs
+  return resources
+    .filter((r) => r.slug)
+    .slice(0, 100)
+    .map((resource) => ({
+      slug: resource.slug!,
+    }))
 }
 
 function getRelatedResources(currentResource: Resource, allResources: Resource[]): Resource[] {
@@ -72,8 +91,17 @@ const categoryLabels: Record<Resource['category'], string> = {
 }
 
 export default async function ResourceDetailPage({ params }: ResourcePageProps) {
-  const { id } = await params
-  const resource = await getResourceById(id)
+  const { slug } = await params
+  
+  // Try to find by slug first, then by ID (for backward compatibility)
+  let resource = await getResourceBySlug(slug)
+  if (!resource && looksLikeId(slug)) {
+    resource = await getResourceById(slug)
+    // If found by ID but has slug, redirect to slug URL
+    if (resource && resource.slug) {
+      redirect(`/resources/${resource.slug}`)
+    }
+  }
 
   if (!resource) {
     notFound()
@@ -82,10 +110,13 @@ export default async function ResourceDetailPage({ params }: ResourcePageProps) 
   const allResources = await getApprovedResources()
   const relatedResources = getRelatedResources(resource, allResources)
 
+  const urlPath = resource.slug || slug
+  const resourceUrl = `${baseUrl}/resources/${urlPath}`
+
   const breadcrumbSchema = generateBreadcrumbSchema([
     { name: 'Home', url: baseUrl },
     { name: 'Resources', url: baseUrl },
-    { name: resource.title, url: `${baseUrl}/resources/${id}` },
+    { name: resource.title, url: resourceUrl },
   ])
 
   return (
@@ -166,7 +197,7 @@ export default async function ResourceDetailPage({ params }: ResourcePageProps) 
 
             {/* Share Buttons */}
             <section>
-              <ShareButtons resource={resource} resourceUrl={`${baseUrl}/resources/${id}`} />
+              <ShareButtons resource={resource} resourceUrl={resourceUrl} />
             </section>
 
             {/* Category and Tags */}
@@ -199,7 +230,7 @@ export default async function ResourceDetailPage({ params }: ResourcePageProps) 
                   {relatedResources.map((related) => (
                     <Link
                       key={related.id}
-                      href={`/resources/${related.id}`}
+                      href={`/resources/${related.slug || related.id}`}
                       className="block p-4 bg-cyber-dark border border-cyber-cyan/30 rounded-sm hover:border-cyber-cyan/60 transition-all"
                     >
                       <h3 className="text-lg font-bold text-cyber-cyan mb-2 font-mono">

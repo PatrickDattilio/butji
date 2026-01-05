@@ -25,7 +25,7 @@ const tagColors: Record<Company['tags'][number], string> = {
 export default function CompanyCard({ company }: CompanyCardProps) {
   return (
     <Link
-      href={`/companies/${company.id}`}
+      href={`/companies/${company.slug || company.id}`}
       className="block group"
     >
       <div className="h-full p-6 bg-cyber-dark rounded-sm border border-red-500/30 cyber-border hover:border-red-500/60 hover:shadow-[0_0_20px_rgba(239,68,68,0.3)] transition-all duration-200 relative group">

@@ -43,7 +43,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Resource pages (if we create detail pages)
   const resources = await getApprovedResources()
   const resourcePages: MetadataRoute.Sitemap = resources.slice(0, 100).map((resource) => ({
-    url: `${baseUrl}/resources/${resource.id}`,
+    url: `${baseUrl}/resources/${resource.slug || resource.id}`,
     lastModified: new Date(),
     changeFrequency: 'weekly' as const,
     priority: 0.7,
@@ -52,7 +52,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Company pages (if detail pages exist)
   const companies = await getAllCompanies()
   const companyPages: MetadataRoute.Sitemap = companies.map((company) => ({
-    url: `${baseUrl}/companies/${company.id}`,
+    url: `${baseUrl}/companies/${company.slug || company.id}`,
     lastModified: company.updatedAt ? new Date(company.updatedAt) : new Date(),
     changeFrequency: 'weekly' as const,
     priority: 0.8,

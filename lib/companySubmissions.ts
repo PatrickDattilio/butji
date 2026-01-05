@@ -146,15 +146,39 @@ function tryParseJSON(str: string): any {
 function tryParseControversies(str: string): ControversyInfo[] | undefined {
   try {
     const parsed = JSON.parse(str)
-    // If it's already an array, return it
+    let controversies: ControversyInfo[] = []
+    
+    // If it's already an array, use it
     if (Array.isArray(parsed)) {
-      return parsed as ControversyInfo[]
+      controversies = parsed as ControversyInfo[]
     }
     // If it's a plain string (old format), convert to array with single item
-    if (typeof parsed === 'string') {
-      return [{ text: parsed }]
+    else if (typeof parsed === 'string') {
+      controversies = [{ text: parsed }]
+    } else {
+      return undefined
     }
-    return undefined
+    
+    // Sort controversies by date (newest first)
+    // Dates are in format like "2025-12", "2026-01", etc.
+    controversies.sort((a, b) => {
+      // If both have dates, compare them (descending order - newest first)
+      if (a.date && b.date) {
+        return b.date.localeCompare(a.date)
+      }
+      // If only a has a date, it comes first
+      if (a.date && !b.date) {
+        return -1
+      }
+      // If only b has a date, it comes first
+      if (!a.date && b.date) {
+        return 1
+      }
+      // If neither has a date, maintain original order
+      return 0
+    })
+    
+    return controversies
   } catch {
     // If parsing fails, treat as old format plain string
     return [{ text: str }]

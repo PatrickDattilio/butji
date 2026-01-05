@@ -1,3 +1,5 @@
+import { DataCenter } from './datacenter'
+
 export interface Company {
   id: string
   name: string
@@ -14,10 +16,12 @@ export interface Company {
   layoffs?: LayoffInfo[]
   tags: CompanyTag[]
   citations?: Record<string, Citation[]>
+  slug?: string
   featured?: boolean
   approved?: boolean
   createdAt?: string
   updatedAt?: string
+  dataCenters?: DataCenter[]
 }
 
 export type CompanyTag =

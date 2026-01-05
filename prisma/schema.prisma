@@ -17,6 +17,7 @@ model Resource {
   url         String
   category    String
   tags        String   // JSON array stored as string
+  slug        String?  @unique
   featured    Boolean  @default(false)
   approved    Boolean  @default(true)
   createdAt   DateTime @default(now())
@@ -24,6 +25,7 @@ model Resource {
 
   @@index([approved])
   @@index([category])
+  @@index([slug])
 }
 
 model Submission {
@@ -61,13 +63,18 @@ model Company {
   layoffs       String?  // JSON array stored as string
   tags          String   // JSON array stored as string
   citations     String?  // JSON object stored as string: { "fieldName": [{ url, title?, date? }] }
+  slug          String?  @unique
   featured      Boolean  @default(false)
   approved      Boolean  @default(true)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
+  ownedDataCenters    DataCenter[]              @relation("DataCenterOwner")
+  usedDataCenters     CompanyDataCenterUser[]
+
   @@index([approved])
   @@index([name])
+  @@index([slug])
 }
 
 model CompanySubmission {
@@ -147,6 +154,48 @@ model Report {
   @@index([type, targetId])
   @@index([status])
   @@index([createdAt])
+}
+
+model DataCenter {
+  id                    String   @id @default(cuid())
+  handle                String   @unique // e.g., "Amazon Canton Mississippi"
+  title                 String
+  project               String?  // e.g., "Project Rainier #speculative"
+  address               String?
+  latitude              String?  // Stored as string to preserve format (e.g., "32°35'25\"N")
+  longitude             String?  // Stored as string to preserve format
+  timelapseImageUrl     String?  // URL from Sentinel satellite timelapse JSON
+  ownerCompanyId        String?  // Company that owns the data center
+  currentH100Equivalents Float?
+  currentPowerMW        Float?
+  currentCapitalCostUSD Float?   // In billions
+  investors             String?  // JSON array stored as string
+  constructionCompanies String?  // JSON array stored as string
+  energyCompanies       String?  // JSON array stored as string
+  citations             String?  // JSON array stored as string: [{ url, title?, date? }]
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  owner                 Company?              @relation("DataCenterOwner", fields: [ownerCompanyId], references: [id])
+  users                 CompanyDataCenterUser[] // Companies using this data center
+
+  @@index([ownerCompanyId])
+  @@index([handle])
+}
+
+model CompanyDataCenterUser {
+  id          String   @id @default(cuid())
+  companyId   String
+  dataCenterId String
+  confidence  String?  // e.g., "#confident", "#speculative", "#likely"
+  createdAt   DateTime @default(now())
+
+  company     Company    @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  dataCenter  DataCenter @relation(fields: [dataCenterId], references: [id], onDelete: Cascade)
+
+  @@unique([companyId, dataCenterId])
+  @@index([companyId])
+  @@index([dataCenterId])
 }
 
 
