@@ -15,7 +15,9 @@
     "postinstall": "prisma generate",
     "script:identify-migrated": "tsx scripts/identify-migrated-companies.ts",
     "script:enrich-company-data": "tsx scripts/enrich-company-data.ts",
-    "script:fetch-logos": "tsx scripts/fetch-company-logos.ts"
+    "script:fetch-logos": "tsx scripts/fetch-company-logos.ts",
+    "script:merge-duplicates": "tsx scripts/merge-duplicate-companies.ts",
+    "script:fetch-photos": "tsx scripts/fetch-person-photos.ts"
   },
   "dependencies": {
     "@prisma/client": "^5.19.1",

@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useMemo, useState, useRef } from 'react'
+import { useCallback, useMemo, useState, useRef, useEffect } from 'react'
 import dynamic from 'next/dynamic'
 import { GraphData, GraphNode, GraphLink, GraphNodeType, GraphLinkType } from '@/lib/companyRelationships'
 import { useRouter } from 'next/navigation'
@@ -67,6 +67,8 @@ export default function CompanyRelationshipGraph({
   })
   const [searchTerm, setSearchTerm] = useState('')
   const graphRef = useRef<any>()
+  // Image cache: Map<imageUrl, { image: HTMLImageElement, loaded: boolean, error: boolean }>
+  const imageCacheRef = useRef<Map<string, { image: HTMLImageElement; loaded: boolean; error: boolean }>>(new Map())
 
     // Filter nodes and links based on filters and search
     const filteredGraphData = useMemo(() => {
@@ -358,6 +360,50 @@ export default function CompanyRelationshipGraph({
     }))
   }
 
+  // Preload images for nodes with logoUrl or photoUrl
+  useEffect(() => {
+    const imageCache = imageCacheRef.current
+    
+    // Collect all unique image URLs from nodes
+    const imageUrls = new Set<string>()
+    graphData.nodes.forEach(node => {
+      if (node.logoUrl) imageUrls.add(node.logoUrl)
+      if (node.photoUrl) imageUrls.add(node.photoUrl)
+    })
+    
+    // Load images that aren't already in cache
+    imageUrls.forEach(url => {
+      if (!imageCache.has(url)) {
+        const img = new Image()
+        img.crossOrigin = 'anonymous' // Handle CORS for images from different domains
+        
+        const cacheEntry = {
+          image: img,
+          loaded: false,
+          error: false,
+        }
+        imageCache.set(url, cacheEntry)
+        
+        img.onload = () => {
+          cacheEntry.loaded = true
+          // Force graph re-render to show loaded images
+          if (graphRef.current) {
+            graphRef.current.refresh()
+          }
+        }
+        
+        img.onerror = () => {
+          cacheEntry.error = true
+        }
+        
+        img.src = url
+      }
+    })
+    
+    // Cleanup: remove images that are no longer needed (optional optimization)
+    // For now, we'll keep all images in cache for performance
+  }, [graphData.nodes])
+  
   // Focus on specific nodes (for initialCompanyIds)
   const focusOnNodes = useCallback(() => {
     if (initialCompanyIds && initialCompanyIds.length > 0 && graphRef.current) {
@@ -471,25 +517,58 @@ export default function CompanyRelationshipGraph({
           backgroundColor="rgba(0, 0, 0, 0)"
           // Custom node rendering
           nodeCanvasObject={(node: any, ctx: CanvasRenderingContext2D, globalScale: number) => {
-            const label = node.name || ''
+            const graphNode = node as GraphNode
+            const label = graphNode.name || ''
             const fontSize = 12 / globalScale
             ctx.font = `${fontSize}px monospace`
             ctx.textAlign = 'center'
             ctx.textBaseline = 'middle'
-            ctx.fillStyle = getNodeColor(node)
+            ctx.fillStyle = getNodeColor(graphNode)
             
             // Draw node shape based on type
-            const size = getNodeSize(node)
+            const size = getNodeSize(graphNode)
+            const imageCache = imageCacheRef.current
+            let imageUrl: string | undefined
+            let shouldDrawImage = false
+            
+            // Determine image URL and whether to draw it
+            if ((graphNode.type === 'company' || graphNode.type === 'capital') && graphNode.logoUrl) {
+              imageUrl = graphNode.logoUrl
+              shouldDrawImage = true
+            } else if (graphNode.type === 'person' && graphNode.photoUrl) {
+              imageUrl = graphNode.photoUrl
+              shouldDrawImage = true
+            }
+            
+            // Check if image is loaded and ready
+            let imageReady = false
+            let cachedImage: HTMLImageElement | null = null
+            if (imageUrl && shouldDrawImage) {
+              const cacheEntry = imageCache.get(imageUrl)
+              if (cacheEntry && cacheEntry.loaded && !cacheEntry.error) {
+                imageReady = true
+                cachedImage = cacheEntry.image
+              }
+            }
+            
+            // Draw node shape (always draw shape as background/border)
             ctx.beginPath()
             
-            if (node.type === 'company') {
+            if (graphNode.type === 'company') {
               // Rectangle for companies
               const rectSize = size * 1.5
               ctx.rect(node.x - rectSize / 2, node.y - rectSize / 2, rectSize, rectSize)
-              ctx.strokeStyle = getNodeColor(node)
+              
+              // Draw background fill if no image
+              if (!imageReady) {
+                ctx.fillStyle = getNodeColor(graphNode) + '20' // Very light fill
+                ctx.fill()
+              }
+              
+              ctx.strokeStyle = getNodeColor(graphNode)
               ctx.lineWidth = 2 / globalScale
               ctx.stroke()
-            } else if (node.type === 'capital') {
+            } else if (graphNode.type === 'capital') {
               // Triangle for capital entities (investment firms)
               const triSize = size * 1.5
               ctx.beginPath()
@@ -497,12 +576,17 @@ export default function CompanyRelationshipGraph({
               ctx.lineTo(node.x - triSize, node.y + triSize) // Bottom left
               ctx.lineTo(node.x + triSize, node.y + triSize) // Bottom right
               ctx.closePath()
-              ctx.fillStyle = getNodeColor(node) + '80' // Add transparency
-              ctx.fill()
-              ctx.strokeStyle = getNodeColor(node)
+              
+              // Draw background fill if no image
+              if (!imageReady) {
+                ctx.fillStyle = getNodeColor(graphNode) + '80' // Add transparency
+                ctx.fill()
+              }
+              
+              ctx.strokeStyle = getNodeColor(graphNode)
               ctx.lineWidth = 2 / globalScale
               ctx.stroke()
-            } else if (node.type === 'data-center') {
+            } else if (graphNode.type === 'data-center') {
               // Hexagon for data centers
               const hexSize = size * 1.2
               const sides = 6
@@ -515,22 +599,86 @@ export default function CompanyRelationshipGraph({
                 else ctx.lineTo(x, y)
               }
               ctx.closePath()
-              ctx.strokeStyle = getNodeColor(node)
+              ctx.strokeStyle = getNodeColor(graphNode)
               ctx.lineWidth = 2 / globalScale
               ctx.stroke()
             } else {
               // Circle for people
               ctx.arc(node.x, node.y, size, 0, 2 * Math.PI)
-              ctx.fillStyle = getNodeColor(node) + '80' // Add transparency
-              ctx.fill()
-              ctx.strokeStyle = getNodeColor(node)
+              
+              // Draw background fill if no image
+              if (!imageReady) {
+                ctx.fillStyle = getNodeColor(graphNode) + '80' // Add transparency
+                ctx.fill()
+              }
+              
+              ctx.strokeStyle = getNodeColor(graphNode)
               ctx.lineWidth = 2 / globalScale
               ctx.stroke()
             }
             
+            // Draw image if loaded
+            if (imageReady && cachedImage) {
+              ctx.save()
+              
+              // Calculate image size - scale with node size and zoom level
+              // The image should fill most of the node shape but leave some border
+              let imageSize: number
+              if (graphNode.type === 'company' || graphNode.type === 'capital') {
+                // For companies/capital: fit inside rectangle/triangle (leave ~10% margin)
+                imageSize = size * 1.0 // Slightly smaller than the shape
+              } else {
+                // For people: fit inside circle (leave ~10% margin)
+                imageSize = size * 1.4 // Slightly smaller than the full circle
+              }
+              
+              // Ensure minimum size for visibility, but don't make too large when zoomed out
+              imageSize = Math.max(8, Math.min(imageSize, 100))
+              
+              const halfSize = imageSize / 2
+              
+              if (graphNode.type === 'person') {
+                // Draw circular clip for person photos
+                ctx.beginPath()
+                ctx.arc(node.x, node.y, halfSize, 0, 2 * Math.PI)
+                ctx.clip()
+              } else if (graphNode.type === 'company') {
+                // Draw rectangular clip for company logos
+                const rectSize = size * 1.2
+                ctx.beginPath()
+                ctx.rect(node.x - rectSize / 2, node.y - rectSize / 2, rectSize, rectSize)
+                ctx.clip()
+              } else if (graphNode.type === 'capital') {
+                // Draw triangular clip for capital logos
+                const triSize = size * 1.2
+                ctx.beginPath()
+                ctx.moveTo(node.x, node.y - triSize)
+                ctx.lineTo(node.x - triSize, node.y + triSize)
+                ctx.lineTo(node.x + triSize, node.y + triSize)
+                ctx.closePath()
+                ctx.clip()
+              }
+              
+              // Draw the image
+              try {
+                ctx.drawImage(
+                  cachedImage,
+                  node.x - halfSize,
+                  node.y - halfSize,
+                  imageSize,
+                  imageSize
+                )
+              } catch (error) {
+                // Silently handle draw errors (e.g., image corrupted)
+                console.warn('Error drawing image:', imageUrl, error)
+              }
+              
+              ctx.restore()
+            }
+            
             // Draw label
             if (globalScale > 0.5) {
-              ctx.fillStyle = getNodeColor(node)
+              ctx.fillStyle = getNodeColor(graphNode)
               ctx.fillText(label, node.x, node.y + size + fontSize + 2)
             }
           }}
