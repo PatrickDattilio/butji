@@ -6,8 +6,9 @@ import { generateCollectionPageSchema, generateBreadcrumbSchema, renderStructure
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXTAUTH_URL || 'https://butji.com'
 
-// ISR: Revalidate every 5 minutes (300 seconds) for faster updates
-export const revalidate = 300
+// Force dynamic rendering to always fetch fresh data
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
 
 export const metadata: Metadata = {
   title: 'AI Company Database - Butji.com | Tracking the Machines',

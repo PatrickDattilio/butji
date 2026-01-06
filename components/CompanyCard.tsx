@@ -99,7 +99,7 @@ export default function CompanyCard({ company }: CompanyCardProps) {
           )}
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          {company.tags.map((tag) => (
+          {Array.isArray(company.tags) && company.tags.map((tag) => (
             <span
               key={tag}
               className={`inline-flex items-center px-2 py-0.5 rounded-sm text-xs font-medium font-mono ${tagColors[tag] || 'bg-cyber-dark text-red-400/60 border border-red-500/30'}`}

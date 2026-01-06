@@ -46,25 +46,37 @@ export async function getAllCompanies(): Promise<Company[]> {
       orderBy: { createdAt: 'desc' },
     })
 
-    return dbCompanies.map((c) => ({
-      id: c.id,
-      name: c.name,
-      description: c.description,
-      website: c.website || undefined,
-      logoUrl: c.logoUrl || undefined,
-      founders: JSON.parse(c.founders) as string[],
-      ceo: c.ceo || undefined,
-      foundedYear: c.foundedYear || undefined,
-      funding: c.funding ? (tryParseJSON(c.funding) || c.funding) : undefined,
-      valuation: c.valuation || undefined,
-      products: JSON.parse(c.products) as string[],
-      controversies: c.controversies ? (tryParseControversies(c.controversies)) : undefined,
-      layoffs: c.layoffs ? (JSON.parse(c.layoffs) as Company['layoffs']) : undefined,
-      tags: JSON.parse(c.tags) as Company['tags'],
+    return dbCompanies.map((c) => {
+      // Helper to safely parse JSON and ensure array
+      const safeParseArray = (jsonStr: string | null | undefined, fallback: any[] = []): any[] => {
+        if (!jsonStr) return fallback
+        try {
+          const parsed = JSON.parse(jsonStr)
+          return Array.isArray(parsed) ? parsed : fallback
+        } catch {
+          return fallback
+        }
+      }
+
+      return {
+        id: c.id,
+        name: c.name,
+        description: c.description,
+        website: c.website || undefined,
+        logoUrl: c.logoUrl || undefined,
+        founders: safeParseArray(c.founders, []),
+        ceo: c.ceo || undefined,
+        foundedYear: c.foundedYear || undefined,
+        funding: c.funding ? (tryParseJSON(c.funding) || c.funding) : undefined,
+        valuation: c.valuation || undefined,
+        products: safeParseArray(c.products, []),
+        controversies: c.controversies ? (tryParseControversies(c.controversies)) : undefined,
+        layoffs: c.layoffs ? (tryParseJSON(c.layoffs) as Company['layoffs']) : undefined,
+        tags: safeParseArray(c.tags, []) as Company['tags'],
       citations: c.citations ? (tryParseJSON(c.citations) as Company['citations']) : undefined,
-      locations: c.locations ? (JSON.parse(c.locations) as Company['locations']) : undefined,
-      directAction: c.directAction ? (JSON.parse(c.directAction) as Company['directAction']) : undefined,
-      unionInfo: c.unionInfo ? (JSON.parse(c.unionInfo) as Company['unionInfo']) : undefined,
+      locations: c.locations ? (tryParseJSON(c.locations) as Company['locations']) : undefined,
+      directAction: c.directAction ? (tryParseJSON(c.directAction) as Company['directAction']) : undefined,
+      unionInfo: c.unionInfo ? (tryParseJSON(c.unionInfo) as Company['unionInfo']) : undefined,
       employeeCount: c.employeeCount || undefined,
       socialMedia: c.socialMedia ? (JSON.parse(c.socialMedia) as Company['socialMedia']) : undefined,
       contactInfo: c.contactInfo ? (JSON.parse(c.contactInfo) as Company['contactInfo']) : undefined,
@@ -73,7 +85,8 @@ export async function getAllCompanies(): Promise<Company[]> {
       approved: c.approved,
       createdAt: c.createdAt.toISOString(),
       updatedAt: c.updatedAt.toISOString(),
-    }))
+      }
+    })
   } catch (error) {
     console.error('Error fetching companies:', error)
     return []
@@ -82,6 +95,17 @@ export async function getAllCompanies(): Promise<Company[]> {
 
 export async function getCompanyById(id: string): Promise<Company | null> {
   try {
+    // Helper to safely parse JSON and ensure array
+    const safeParseArray = (jsonStr: string | null | undefined, fallback: any[] = []): any[] => {
+      if (!jsonStr) return fallback
+      try {
+        const parsed = JSON.parse(jsonStr)
+        return Array.isArray(parsed) ? parsed : fallback
+      } catch {
+        return fallback
+      }
+    }
+
     const company = await prisma.company.findUnique({
       where: { id },
       include: {
@@ -133,15 +157,15 @@ export async function getCompanyById(id: string): Promise<Company | null> {
       description: company.description,
       website: company.website || undefined,
       logoUrl: company.logoUrl || undefined,
-      founders: JSON.parse(company.founders) as string[],
+      founders: safeParseArray(company.founders, []),
       ceo: company.ceo || undefined,
       foundedYear: company.foundedYear || undefined,
       funding: company.funding ? (tryParseJSON(company.funding) || company.funding) : undefined,
       valuation: company.valuation || undefined,
-      products: JSON.parse(company.products) as string[],
+      products: safeParseArray(company.products, []),
       controversies: company.controversies ? (tryParseControversies(company.controversies)) : undefined,
-      layoffs: company.layoffs ? (JSON.parse(company.layoffs) as Company['layoffs']) : undefined,
-      tags: JSON.parse(company.tags) as Company['tags'],
+      layoffs: company.layoffs ? (tryParseJSON(company.layoffs) as Company['layoffs']) : undefined,
+      tags: safeParseArray(company.tags, []) as Company['tags'],
       citations: company.citations ? (tryParseJSON(company.citations) as Company['citations']) : undefined,
       locations: company.locations ? (JSON.parse(company.locations) as Company['locations']) : undefined,
       directAction: company.directAction ? (JSON.parse(company.directAction) as Company['directAction']) : undefined,
@@ -219,6 +243,17 @@ export async function getCompanyById(id: string): Promise<Company | null> {
 
 export async function getCompanyBySlug(slug: string): Promise<Company | null> {
   try {
+    // Helper to safely parse JSON and ensure array
+    const safeParseArray = (jsonStr: string | null | undefined, fallback: any[] = []): any[] => {
+      if (!jsonStr) return fallback
+      try {
+        const parsed = JSON.parse(jsonStr)
+        return Array.isArray(parsed) ? parsed : fallback
+      } catch {
+        return fallback
+      }
+    }
+
     const company = await prisma.company.findUnique({
       where: { slug },
       include: {
@@ -270,15 +305,15 @@ export async function getCompanyBySlug(slug: string): Promise<Company | null> {
       description: company.description,
       website: company.website || undefined,
       logoUrl: company.logoUrl || undefined,
-      founders: JSON.parse(company.founders) as string[],
+      founders: safeParseArray(company.founders, []),
       ceo: company.ceo || undefined,
       foundedYear: company.foundedYear || undefined,
       funding: company.funding ? (tryParseJSON(company.funding) || company.funding) : undefined,
       valuation: company.valuation || undefined,
-      products: JSON.parse(company.products) as string[],
+      products: safeParseArray(company.products, []),
       controversies: company.controversies ? (tryParseControversies(company.controversies)) : undefined,
-      layoffs: company.layoffs ? (JSON.parse(company.layoffs) as Company['layoffs']) : undefined,
-      tags: JSON.parse(company.tags) as Company['tags'],
+      layoffs: company.layoffs ? (tryParseJSON(company.layoffs) as Company['layoffs']) : undefined,
+      tags: safeParseArray(company.tags, []) as Company['tags'],
       citations: company.citations ? (tryParseJSON(company.citations) as Company['citations']) : undefined,
       locations: company.locations ? (JSON.parse(company.locations) as Company['locations']) : undefined,
       directAction: company.directAction ? (JSON.parse(company.directAction) as Company['directAction']) : undefined,
