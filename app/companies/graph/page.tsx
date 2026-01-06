@@ -53,12 +53,20 @@ export default async function CompanyGraphPage({ searchParams }: GraphPageProps)
   // Build graph data
   // For performance, limit to top 100 companies if not focusing on specific companies
   // When focusing, include related companies (connections)
-  const graphData = await buildGraphData(initialCompanyIds, {
+  let graphData = await buildGraphData(initialCompanyIds, {
     includePeople: true,
     includeDataCenters: true,
     includePartnerships: true,
     maxDepth: focusSlug ? 2 : 1, // Deeper depth when focusing on specific companies
   })
+  
+  // Ensure graphData has the correct structure (defensive check)
+  if (!graphData || !Array.isArray(graphData.nodes)) {
+    graphData = { nodes: [], links: [] }
+  }
+  if (!Array.isArray(graphData.links)) {
+    graphData.links = []
+  }
 
   const breadcrumbSchema = generateBreadcrumbSchema([
     { name: 'Home', url: baseUrl },
@@ -141,19 +149,19 @@ export default async function CompanyGraphPage({ searchParams }: GraphPageProps)
           <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="bg-cyber-dark border border-cyber-cyan/30 rounded-sm p-4 cyber-border">
               <div className="text-2xl font-bold text-cyber-cyan font-mono">
-                {graphData.nodes.filter(n => n.type === 'company').length}
+                {Array.isArray(graphData?.nodes) ? graphData.nodes.filter(n => n.type === 'company').length : 0}
               </div>
               <div className="text-sm text-cyber-cyan/60 font-mono uppercase">Companies</div>
             </div>
             <div className="bg-cyber-dark border border-cyber-cyan/30 rounded-sm p-4 cyber-border">
               <div className="text-2xl font-bold text-cyber-cyan font-mono">
-                {graphData.nodes.filter(n => n.type === 'person').length}
+                {Array.isArray(graphData?.nodes) ? graphData.nodes.filter(n => n.type === 'person').length : 0}
               </div>
               <div className="text-sm text-cyber-cyan/60 font-mono uppercase">People</div>
             </div>
             <div className="bg-cyber-dark border border-cyber-cyan/30 rounded-sm p-4 cyber-border">
               <div className="text-2xl font-bold text-cyber-cyan font-mono">
-                {graphData.links.length}
+                {Array.isArray(graphData?.links) ? graphData.links.length : 0}
               </div>
               <div className="text-sm text-cyber-cyan/60 font-mono uppercase">Relationships</div>
             </div>

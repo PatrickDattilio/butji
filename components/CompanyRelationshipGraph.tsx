@@ -73,6 +73,12 @@ export default function CompanyRelationshipGraph({
       // CRITICAL: graphData.links should always contain ALL edges
       // We never mutate it, only filter it to create filteredLinks
       
+      // Defensive check: ensure graphData has valid structure
+      if (!graphData || !Array.isArray(graphData.nodes) || !Array.isArray(graphData.links)) {
+        console.warn('Invalid graphData structure:', graphData)
+        return { nodes: [], links: [] }
+      }
+      
       // Step 1: Filter nodes by type and search
       let filteredNodes = graphData.nodes.filter((node) => {
         // Filter by node type

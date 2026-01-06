@@ -145,6 +145,11 @@ function isCapitalEntity(name: string): boolean {
  * Extract person names from funding investors array
  */
 function extractPersonNamesFromInvestors(investors: string[]): string[] {
+  // Defensive check: ensure investors is an array
+  if (!investors || !Array.isArray(investors)) {
+    return []
+  }
+  
   // Common company names that are not people
   const companyIndicators = [
     'inc', 'llc', 'corp', 'ltd', 'ventures', 'capital', 'partners',
@@ -179,6 +184,11 @@ function extractPersonNamesFromInvestors(investors: string[]): string[] {
  * Extract person names from founders array
  */
 function extractPersonNamesFromFounders(founders: string[]): string[] {
+  // Defensive check: ensure founders is an array
+  if (!founders || !Array.isArray(founders)) {
+    return []
+  }
+  
   // Founders are typically people, but filter out obvious companies
   const companyIndicators = [
     'inc', 'llc', 'corp', 'ltd', 'ventures', 'capital', 'partners',
@@ -408,7 +418,8 @@ function extractFounderRelationships(
 ): GraphLink[] {
   const links: GraphLink[] = []
   
-  if (!company.founders || company.founders.length === 0) {
+  // Defensive check: ensure founders is an array
+  if (!company.founders || !Array.isArray(company.founders) || company.founders.length === 0) {
     return links
   }
   
@@ -1053,10 +1064,13 @@ export async function buildGraphData(
     }
   }
   
-  return {
-    nodes: uniqueNodes,
-    links: uniqueLinks,
+  // Ensure we always return a valid GraphData structure
+  const result: GraphData = {
+    nodes: Array.isArray(uniqueNodes) ? uniqueNodes : [],
+    links: Array.isArray(uniqueLinks) ? uniqueLinks : [],
   }
+  
+  return result
 }
 
 // Helper function for JSON parsing
