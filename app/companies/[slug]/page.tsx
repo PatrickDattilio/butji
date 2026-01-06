@@ -168,11 +168,22 @@ export default async function CompanyDetailPage({ params }: CompanyPageProps) {
                     targetName={company.name}
                   />
                 </div>
-                {company.featured && (
-                  <span className="inline-flex items-center px-2 py-1 text-xs font-bold rounded-sm bg-red-500/20 text-red-400 border border-red-500/50 font-mono uppercase terminal-glow">
-                    Featured
-                  </span>
-                )}
+                <div className="flex items-center gap-3 flex-wrap">
+                  {company.featured && (
+                    <span className="inline-flex items-center px-2 py-1 text-xs font-bold rounded-sm bg-red-500/20 text-red-400 border border-red-500/50 font-mono uppercase terminal-glow">
+                      Featured
+                    </span>
+                  )}
+                  <Link
+                    href={`/companies/graph?focus=${company.slug || company.id}`}
+                    className="inline-flex items-center gap-2 px-3 py-1.5 text-xs font-bold rounded-sm bg-cyber-cyan/10 text-cyber-cyan border border-cyber-cyan/40 hover:border-cyber-cyan/60 hover:bg-cyber-cyan/20 font-mono uppercase transition-all terminal-glow"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                    View Relationships
+                  </Link>
+                </div>
               </div>
             </div>
           </div>

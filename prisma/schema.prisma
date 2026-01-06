@@ -75,12 +75,26 @@ model Company {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
+  // Relationship fields
+  parentCompanyId String?
+  parentCompany   Company?  @relation("CompanyHierarchy", fields: [parentCompanyId], references: [id])
+  subsidiaries    Company[] @relation("CompanyHierarchy")
+  partnerships    String?   // JSON array stored as string: [{ companyId, type, description? }]
+
+  // Relationships via join tables
+  boardMembers    CompanyBoardMember[]
+  investments     CompanyInvestment[] @relation("CompanyInvestments")
+  investors       CompanyInvestment[] @relation("CompanyInvestors")
+  foundersRelation CompanyFounder[]
+
+  // Existing relationships
   ownedDataCenters    DataCenter[]              @relation("DataCenterOwner")
   usedDataCenters     CompanyDataCenterUser[]
 
   @@index([approved])
   @@index([name])
   @@index([slug])
+  @@index([parentCompanyId])
 }
 
 model CompanySubmission {
@@ -208,6 +222,77 @@ model CompanyDataCenterUser {
   @@unique([companyId, dataCenterId])
   @@index([companyId])
   @@index([dataCenterId])
+}
+
+model Person {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String?  @unique
+  bio         String?  @db.Text
+  photoUrl    String?
+  linkedinUrl String?
+  wikipediaUrl String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  boardPositions    CompanyBoardMember[]
+  investments       CompanyInvestment[]
+  foundedCompanies  CompanyFounder[]
+  
+  @@index([name])
+  @@index([slug])
+}
+
+model CompanyBoardMember {
+  id        String   @id @default(cuid())
+  personId  String
+  companyId String
+  title     String   // e.g., "Board Member", "Chairman", "Independent Director"
+  startDate DateTime?
+  endDate   DateTime?
+  createdAt DateTime @default(now())
+
+  person    Person   @relation(fields: [personId], references: [id], onDelete: Cascade)
+  company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@unique([personId, companyId])
+  @@index([personId])
+  @@index([companyId])
+}
+
+model CompanyInvestment {
+  id          String   @id @default(cuid())
+  personId    String?  // Nullable - can be person or company investor
+  companyId   String   // The company receiving investment
+  investorCompanyId String? // If investor is a company, not a person
+  amount      String?  // e.g., "$10M", "Series A"
+  round       String?  // e.g., "Series A", "Seed"
+  date        DateTime?
+  role        String?  // e.g., "Lead Investor", "Participant"
+  createdAt   DateTime @default(now())
+
+  person      Person?  @relation(fields: [personId], references: [id], onDelete: Cascade)
+  company     Company  @relation("CompanyInvestments", fields: [companyId], references: [id], onDelete: Cascade)
+  investorCompany Company? @relation("CompanyInvestors", fields: [investorCompanyId], references: [id], onDelete: Cascade)
+
+  @@index([personId])
+  @@index([companyId])
+  @@index([investorCompanyId])
+}
+
+model CompanyFounder {
+  id        String   @id @default(cuid())
+  personId  String
+  companyId String
+  role      String?  // e.g., "Co-founder", "Founder"
+  createdAt DateTime @default(now())
+
+  person    Person   @relation(fields: [personId], references: [id], onDelete: Cascade)
+  company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@unique([personId, companyId])
+  @@index([personId])
+  @@index([companyId])
 }
 
 

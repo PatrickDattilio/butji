@@ -1,4 +1,5 @@
 import { DataCenter } from './datacenter'
+import type { Person, BoardPosition, Investment } from './person'
 
 export interface Company {
   id: string
@@ -28,6 +29,22 @@ export interface Company {
   createdAt?: string
   updatedAt?: string
   dataCenters?: DataCenter[]
+  // Relationship fields
+  parentCompanyId?: string
+  parentCompany?: Company
+  subsidiaries?: Company[]
+  partnerships?: Partnership[]
+  boardMembers?: BoardPosition[]
+  investments?: Investment[]
+  investors?: Investment[]
+  foundersRelation?: Person[]
+}
+
+export interface Partnership {
+  companyId: string
+  type: 'strategic' | 'investment' | 'technology' | 'supply-chain' | 'other'
+  description?: string
+  date?: string
 }
 
 export type CompanyTag =
