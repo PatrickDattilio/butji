@@ -314,25 +314,26 @@ export default function CompanyRelationshipGraph({
 
   // Handle node click
   const handleNodeClick = useCallback(
-    (node: GraphNode) => {
-      if (node.type === 'company' && node.slug) {
-        router.push(`/companies/${node.slug}`)
-      } else if (node.type === 'person' && node.slug) {
+    (node: any) => {
+      const graphNode = node as GraphNode
+      if (graphNode.type === 'company' && graphNode.slug) {
+        router.push(`/companies/${graphNode.slug}`)
+      } else if (graphNode.type === 'person' && graphNode.slug) {
         // Future: navigate to person detail page
-        // router.push(`/people/${node.slug}`)
+        // router.push(`/people/${graphNode.slug}`)
       }
     },
     [router]
   )
 
   // Handle node hover
-  const handleNodeHover = useCallback((node: GraphNode | null) => {
-    setHoveredNode(node)
+  const handleNodeHover = useCallback((node: any) => {
+    setHoveredNode(node ? (node as GraphNode) : null)
   }, [])
 
   // Handle link hover
-  const handleLinkHover = useCallback((link: GraphLink | null) => {
-    setHoveredLink(link)
+  const handleLinkHover = useCallback((link: any) => {
+    setHoveredLink(link ? (link as GraphLink) : null)
   }, [])
 
   // Toggle node type filter
@@ -430,28 +431,30 @@ export default function CompanyRelationshipGraph({
         <ForceGraph2D
           ref={graphRef}
           graphData={filteredGraphData}
-          nodeLabel={(node: GraphNode) => {
-            let label = node.name
-            if (node.type === 'person' && hoveredNode?.id === node.id) {
+          nodeLabel={(node: any) => {
+            const graphNode = node as GraphNode
+            let label = graphNode.name
+            if (graphNode.type === 'person' && hoveredNode?.id === graphNode.id) {
               // Could add more info here in the future
-              label += ` (${node.type})`
+              label += ` (${graphNode.type})`
             }
             return label
           }}
-          nodeColor={getNodeColor}
-          nodeVal={getNodeSize}
+          nodeColor={getNodeColor as any}
+          nodeVal={getNodeSize as any}
           nodeRelSize={6}
-          linkLabel={(link: GraphLink) => {
-            return linkTypeLabels[link.type] || link.type
+          linkLabel={(link: any) => {
+            const graphLink = link as GraphLink
+            return linkTypeLabels[graphLink.type] || graphLink.type
           }}
-          linkColor={getLinkColor}
-          linkWidth={getLinkWidth}
+          linkColor={getLinkColor as any}
+          linkWidth={getLinkWidth as any}
           linkDirectionalArrowLength={4}
           linkDirectionalArrowRelPos={1}
           linkCurvature={0.1}
-          onNodeClick={handleNodeClick}
-          onNodeHover={handleNodeHover}
-          onLinkHover={handleLinkHover}
+          onNodeClick={handleNodeClick as any}
+          onNodeHover={handleNodeHover as any}
+          onLinkHover={handleLinkHover as any}
           cooldownTicks={100}
           onEngineStop={() => {
             // Focus on initial companies after graph stabilizes

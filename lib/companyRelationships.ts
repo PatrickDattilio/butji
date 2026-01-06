@@ -625,7 +625,7 @@ export async function buildGraphData(
   let companies: Company[]
   if (companyIds && companyIds.length > 0) {
     // Fetch specific companies
-    companies = await Promise.all(
+    const companiesWithNulls = await Promise.all(
       companyIds.map(async (id) => {
         const company = await prisma.company.findUnique({
           where: { id },
@@ -697,7 +697,8 @@ export async function buildGraphData(
         } as Company
       })
     )
-    companies = companies.filter((c): c is Company => c !== null)
+    // Filter out null values (companies that weren't found)
+    companies = companiesWithNulls.filter((c): c is Company => c !== null)
   } else {
     // Fetch all approved companies
     const dbCompanies = await prisma.company.findMany({
