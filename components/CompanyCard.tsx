@@ -3,6 +3,8 @@
 import { Company } from '@/types/company'
 import Link from 'next/link'
 import ReportButton from './ReportButton'
+import LogoDevAttribution from './LogoDevAttribution'
+import { isLogoDevUrl } from '@/lib/logoUtils'
 
 interface CompanyCardProps {
   company: Company
@@ -45,7 +47,7 @@ export default function CompanyCard({ company }: CompanyCardProps) {
         )}
         <div className="flex items-start justify-between mb-3 gap-3">
           {company.logoUrl && (
-            <div className="flex-shrink-0">
+            <div className="flex-shrink-0 flex flex-col items-center">
               <img
                 src={company.logoUrl}
                 alt={`${company.name} logo`}
@@ -55,6 +57,9 @@ export default function CompanyCard({ company }: CompanyCardProps) {
                   e.currentTarget.style.display = 'none'
                 }}
               />
+              {isLogoDevUrl(company.logoUrl) && (
+                <LogoDevAttribution variant="inline" className="mt-1" />
+              )}
             </div>
           )}
           <h3 className="text-lg font-bold text-red-400 group-hover:text-red-300 transition-colors font-mono flex-1">

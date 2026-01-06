@@ -4,6 +4,8 @@ import { useCallback, useMemo, useState, useRef, useEffect } from 'react'
 import dynamic from 'next/dynamic'
 import { GraphData, GraphNode, GraphLink, GraphNodeType, GraphLinkType } from '@/lib/companyRelationships'
 import { useRouter } from 'next/navigation'
+import LogoDevAttribution from './LogoDevAttribution'
+import { isLogoDevUrl } from '@/lib/logoUtils'
 
 // Dynamically import react-force-graph-2d to avoid SSR issues
 const ForceGraph2D = dynamic(() => import('react-force-graph-2d'), {
@@ -359,6 +361,15 @@ export default function CompanyRelationshipGraph({
       [type]: !prev[type],
     }))
   }
+
+  // Check if any logos are from logo.dev (for attribution)
+  const hasLogoDevLogos = useMemo(() => {
+    return graphData.nodes.some(node => 
+      (node.type === 'company' || node.type === 'capital') && 
+      node.logoUrl && 
+      isLogoDevUrl(node.logoUrl)
+    )
+  }, [graphData.nodes])
 
   // Preload images for nodes with logoUrl or photoUrl
   useEffect(() => {
@@ -725,7 +736,7 @@ export default function CompanyRelationshipGraph({
         {/* Legend */}
         <div className="absolute bottom-4 left-4 bg-cyber-dark/90 border border-cyber-cyan/30 rounded-sm p-3 z-10 cyber-border">
           <div className="text-xs font-bold text-cyber-cyan font-mono uppercase mb-2">Legend</div>
-          <div className="space-y-1 text-xs font-mono">
+          <div className="space-y-1 text-xs font-mono mb-2">
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 border-2 border-cyber-cyan"></div>
               <span className="text-cyber-cyan/80">Company</span>

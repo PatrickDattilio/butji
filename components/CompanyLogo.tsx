@@ -2,14 +2,17 @@
 
 import { useState } from 'react'
 import Image from 'next/image'
+import LogoDevAttribution from './LogoDevAttribution'
+import { isLogoDevUrl } from '@/lib/logoUtils'
 
 interface CompanyLogoProps {
   logoUrl: string
   companyName: string
   className?: string
+  showAttribution?: boolean
 }
 
-export default function CompanyLogo({ logoUrl, companyName, className = '' }: CompanyLogoProps) {
+export default function CompanyLogo({ logoUrl, companyName, className = '', showAttribution = true }: CompanyLogoProps) {
   const [imageError, setImageError] = useState(false)
   const [imageLoading, setImageLoading] = useState(true)
 
@@ -30,24 +33,29 @@ export default function CompanyLogo({ logoUrl, companyName, className = '' }: Co
   }
 
   return (
-    <div className="flex-shrink-0">
-      <Image
-        src={logoUrl}
-        alt={`${companyName} logo`}
-        width={80}
-        height={80}
-        className={`w-16 h-16 md:w-20 md:h-20 object-contain rounded-sm border border-red-500/30 bg-cyber-darker/50 p-2 ${className}`}
-        unoptimized
-        onError={() => {
-          setImageError(true)
-          setImageLoading(false)
-        }}
-        onLoad={() => setImageLoading(false)}
-      />
-      {imageLoading && (
-        <div className="absolute w-16 h-16 md:w-20 md:h-20 flex items-center justify-center rounded-sm border border-red-500/30 bg-cyber-darker/50">
-          <span className="text-red-400/30 font-mono text-xs">Loading...</span>
-        </div>
+    <div className="flex-shrink-0 flex flex-col items-center">
+      <div className="relative">
+        <Image
+          src={logoUrl}
+          alt={`${companyName} logo`}
+          width={80}
+          height={80}
+          className={`w-16 h-16 md:w-20 md:h-20 object-contain rounded-sm border border-red-500/30 bg-cyber-darker/50 p-2 ${className}`}
+          unoptimized
+          onError={() => {
+            setImageError(true)
+            setImageLoading(false)
+          }}
+          onLoad={() => setImageLoading(false)}
+        />
+        {imageLoading && (
+          <div className="absolute w-16 h-16 md:w-20 md:h-20 flex items-center justify-center rounded-sm border border-red-500/30 bg-cyber-darker/50">
+            <span className="text-red-400/30 font-mono text-xs">Loading...</span>
+          </div>
+        )}
+      </div>
+      {showAttribution && isLogoDevUrl(logoUrl) && (
+        <LogoDevAttribution variant="inline" className="mt-1" />
       )}
     </div>
   )

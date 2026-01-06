@@ -4,6 +4,7 @@ import { buildGraphData } from '@/lib/companyRelationships'
 import { getCompanyBySlug, getAllCompanies } from '@/lib/companies'
 import CompanyRelationshipGraph from '@/components/CompanyRelationshipGraph'
 import { generateBreadcrumbSchema, renderStructuredData } from '@/lib/seo'
+import LogoDevAttribution from '@/components/LogoDevAttribution'
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXTAUTH_URL || 'https://butji.com'
 
@@ -167,6 +168,18 @@ export default async function CompanyGraphPage({ searchParams }: GraphPageProps)
             </div>
           </div>
         </main>
+
+        {/* Footer */}
+        <footer className="bg-cyber-dark border-t border-cyber-cyan/40 mt-16 cyber-border relative z-10">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <p className="text-center text-cyber-cyan/60 text-sm font-mono mb-2">
+              &gt; Butji.com - Organizing the effort against the machines
+            </p>
+            <div className="text-center">
+              <LogoDevAttribution variant="footer" />
+            </div>
+          </div>
+        </footer>
       </div>
     </>
   )
