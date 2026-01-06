@@ -8,8 +8,8 @@ import { generateCollectionPageSchema, renderStructuredData } from '@/lib/seo'
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXTAUTH_URL || 'https://butji.com'
 
-// ISR: Revalidate every hour (3600 seconds)
-export const revalidate = 3600
+// ISR: Revalidate every 5 minutes (300 seconds) for faster updates
+export const revalidate = 300
 
 export const metadata: Metadata = {
   title: 'Butji - Anti-AI Tools & Resources | Butlerian Jihad',
