@@ -17,7 +17,8 @@
     "script:enrich-company-data": "tsx scripts/enrich-company-data.ts",
     "script:fetch-logos": "tsx scripts/fetch-company-logos.ts",
     "script:merge-duplicates": "tsx scripts/merge-duplicate-companies.ts",
-    "script:fetch-photos": "tsx scripts/fetch-person-photos.ts"
+    "script:fetch-photos": "tsx scripts/fetch-person-photos.ts",
+    "script:backup-db": "tsx scripts/backup-database.ts"
   },
   "dependencies": {
     "@prisma/client": "^5.19.1",
@@ -25,6 +26,7 @@
     "isomorphic-dompurify": "^2.35.0",
     "next": "^16.1.0",
     "next-auth": "^4.24.7",
+    "pg": "^8.16.3",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-force-graph-2d": "^1.29.0",
@@ -33,6 +35,7 @@
   "devDependencies": {
     "@types/dompurify": "^3.0.5",
     "@types/node": "^22.7.5",
+    "@types/pg": "^8.16.0",
     "@types/react": "^18.3.11",
     "@types/react-dom": "^18.3.0",
     "autoprefixer": "^10.4.20",

@@ -2,6 +2,41 @@ import { Company, ControversyInfo, Citation } from '@/types/company'
 import { prisma } from './prisma'
 
 /**
+ * Check if a URL appears to be a stock ticker/exchange URL instead of a company website
+ */
+function isStockTickerUrl(url: string): boolean {
+  const stockExchangePatterns = [
+    /nyse\.com\/quote/i,
+    /nasdaq\.com\/quote/i,
+    /finance\.yahoo\.com\/quote/i,
+    /marketwatch\.com\/investing\/stock/i,
+    /\.com\/quote\//i,
+    /\/quote\/[A-Z]+:/i, // Pattern like /quote/XNYS:BLK
+  ]
+  return stockExchangePatterns.some(pattern => pattern.test(url))
+}
+
+/**
+ * Validate company website URL
+ * Returns error message if invalid, null if valid
+ */
+export function validateCompanyWebsite(url: string | undefined): string | null {
+  if (!url) return null // Optional field
+  
+  try {
+    new URL(url) // Basic URL validation
+  } catch {
+    return 'Invalid URL format'
+  }
+  
+  if (isStockTickerUrl(url)) {
+    return 'URL appears to be a stock ticker/exchange page, not a company website. Please use the actual company website URL.'
+  }
+  
+  return null
+}
+
+/**
  * Generate a URL-friendly slug from a string
  */
 function generateSlug(text: string): string {
@@ -241,6 +276,32 @@ export async function getCompanyById(id: string): Promise<Company | null> {
   }
 }
 
+/**
+ * Find a company by name (case-insensitive)
+ */
+export async function getCompanyByName(name: string): Promise<{ id: string; name: string; slug: string | null } | null> {
+  try {
+    const company = await prisma.company.findFirst({
+      where: {
+        name: {
+          equals: name,
+          mode: 'insensitive',
+        },
+        approved: true,
+      },
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+      },
+    })
+    return company
+  } catch (error) {
+    console.error('Error finding company by name:', error)
+    return null
+  }
+}
+
 export async function getCompanyBySlug(slug: string): Promise<Company | null> {
   try {
     // Helper to safely parse JSON and ensure array
@@ -390,6 +451,12 @@ export async function getCompanyBySlug(slug: string): Promise<Company | null> {
 }
 
 export async function createCompany(company: Omit<Company, 'id' | 'createdAt' | 'updatedAt'>): Promise<Company> {
+  // Validate website URL
+  const websiteError = validateCompanyWebsite(company.website)
+  if (websiteError) {
+    throw new Error(websiteError)
+  }
+  
   // Generate slug if not provided
   const baseSlug = company.slug || generateSlug(company.name)
   const slug = baseSlug ? await ensureUniqueSlug(baseSlug) : null
@@ -453,6 +520,13 @@ export async function createCompany(company: Omit<Company, 'id' | 'createdAt' | 
   }
 
 export async function updateCompany(id: string, company: Partial<Omit<Company, 'id' | 'createdAt' | 'updatedAt'>>): Promise<Company> {
+  // Validate website URL if provided
+  if (company.website !== undefined) {
+    const websiteError = validateCompanyWebsite(company.website)
+    if (websiteError) {
+      throw new Error(websiteError)
+    }
+  }
   // Generate slug if name changed and slug not explicitly provided
   let slug = company.slug
   if (company.name && !slug) {

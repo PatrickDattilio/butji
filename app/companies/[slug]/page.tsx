@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { notFound, redirect } from 'next/navigation'
-import { getCompanyBySlug, getCompanyById } from '@/lib/companies'
+import { getCompanyBySlug, getCompanyById, getCompanyByName } from '@/lib/companies'
 import Link from 'next/link'
 import { generateBreadcrumbSchema, renderStructuredData } from '@/lib/seo'
 import CitationLink from '@/components/CitationLink'
@@ -583,9 +583,28 @@ export default async function CompanyDetailPage({ params }: CompanyPageProps) {
                         <div>
                           <p><strong>Investors:</strong></p>
                           <ul className="list-disc list-inside ml-4">
-                            {company.funding.investors.map((investor, index) => (
-                              <li key={index}>{investor}</li>
-                            ))}
+                            {await Promise.all(
+                              company.funding.investors.map(async (investor, index) => {
+                                const investorCompany = await getCompanyByName(investor)
+                                if (investorCompany) {
+                                  return (
+                                    <li key={index}>
+                                      <Link
+                                        href={`/companies/${investorCompany.slug || investorCompany.id}`}
+                                        className="text-red-400 hover:text-red-300 transition-colors font-mono underline"
+                                      >
+                                        {investor}
+                                      </Link>
+                                    </li>
+                                  )
+                                }
+                                return (
+                                  <li key={index} className="text-red-400/90 font-mono">
+                                    {investor}
+                                  </li>
+                                )
+                              })
+                            )}
                           </ul>
                         </div>
                       )}

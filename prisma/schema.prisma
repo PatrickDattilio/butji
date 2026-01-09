@@ -225,15 +225,18 @@ model CompanyDataCenterUser {
 }
 
 model Person {
-  id          String   @id @default(cuid())
-  name        String
-  slug        String?  @unique
-  bio         String?  @db.Text
-  photoUrl    String?
-  linkedinUrl String?
-  wikipediaUrl String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id            String   @id @default(cuid())
+  name          String
+  slug          String?  @unique
+  bio           String?  @db.Text
+  photoUrl      String?
+  photoSource   String?  // 'wikipedia' | 'wikimedia' | 'corporate' | 'linkedin' | 'twitter' | 'github' | 'other'
+  photoSourceUrl String? // URL where photo was found (e.g., company page URL)
+  linkedinUrl   String?
+  twitterHandle String?
+  wikipediaUrl  String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   boardPositions    CompanyBoardMember[]
   investments       CompanyInvestment[]

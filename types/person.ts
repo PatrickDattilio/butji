@@ -7,7 +7,10 @@ export interface Person {
   slug?: string
   bio?: string
   photoUrl?: string
+  photoSource?: string // 'wikipedia' | 'wikimedia' | 'corporate' | 'linkedin' | 'twitter' | 'github' | 'other'
+  photoSourceUrl?: string // URL where photo was found (e.g., company page URL)
   linkedinUrl?: string
+  twitterHandle?: string
   wikipediaUrl?: string
   createdAt?: string
   updatedAt?: string

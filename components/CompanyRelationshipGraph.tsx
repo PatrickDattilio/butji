@@ -34,6 +34,7 @@ const linkTypeLabels: Record<GraphLinkType, string> = {
   subsidiary: 'Subsidiary',
   'board-member': 'Board Member',
   founder: 'Founder',
+  ceo: 'CEO',
   partnership: 'Partnership',
   'data-center-owner': 'Owns Data Center',
   'data-center-user': 'Uses Data Center',
@@ -51,6 +52,7 @@ export default function CompanyRelationshipGraph({
   const router = useRouter()
   const [hoveredNode, setHoveredNode] = useState<GraphNode | null>(null)
   const [hoveredLink, setHoveredLink] = useState<GraphLink | null>(null)
+  const [selectedNode, setSelectedNode] = useState<GraphNode | null>(null)
   const [nodeFilters, setNodeFilters] = useState<Record<GraphNodeType, boolean>>({
     company: true,
     person: true,
@@ -63,11 +65,13 @@ export default function CompanyRelationshipGraph({
     subsidiary: showSubsidiaries,
     'board-member': showBoardMembers,
     founder: true,
+    ceo: true,
     partnership: showPartnerships,
     'data-center-owner': showDataCenters,
     'data-center-user': showDataCenters,
   })
   const [searchTerm, setSearchTerm] = useState('')
+  const [imageLoadTrigger, setImageLoadTrigger] = useState(0)
   const graphRef = useRef<any>()
   // Image cache: Map<imageUrl, { image: HTMLImageElement, loaded: boolean, error: boolean }>
   const imageCacheRef = useRef<Map<string, { image: HTMLImageElement; loaded: boolean; error: boolean }>>(new Map())
@@ -83,10 +87,63 @@ export default function CompanyRelationshipGraph({
         return { nodes: [], links: [] }
       }
       
-      // Step 1: Filter nodes by type and search
+      // Helper function to extract node ID from link source/target
+      const getNodeId = (nodeOrId: string | any): string => {
+        return typeof nodeOrId === 'string' ? nodeOrId : (nodeOrId?.id || nodeOrId)
+      }
+
+      // If a company is selected, find connected nodes (2 levels deep)
+      let focusedNodeIds: Set<string> | null = null
+      if (selectedNode && selectedNode.type === 'company') {
+        focusedNodeIds = new Set<string>()
+        focusedNodeIds.add(selectedNode.id) // Level 0: selected company
+        
+        // Level 1: Directly connected nodes
+        const level1NodeIds = new Set<string>()
+        graphData.links.forEach((link) => {
+          const sourceId = getNodeId(link.source)
+          const targetId = getNodeId(link.target)
+          
+          if (sourceId === selectedNode.id) {
+            level1NodeIds.add(targetId)
+            focusedNodeIds!.add(targetId)
+          } else if (targetId === selectedNode.id) {
+            level1NodeIds.add(sourceId)
+            focusedNodeIds!.add(sourceId)
+          }
+        })
+        
+        // Level 2: Only people connected to level 1 nodes (filter out companies, capital, data centers)
+        level1NodeIds.forEach((level1Id) => {
+          graphData.links.forEach((link) => {
+            const sourceId = getNodeId(link.source)
+            const targetId = getNodeId(link.target)
+            
+            // Check if source is level 1 and target is a person
+            if (sourceId === level1Id && targetId !== selectedNode.id) {
+              const targetNode = graphData.nodes.find(n => n.id === targetId)
+              if (targetNode && targetNode.type === 'person') {
+                focusedNodeIds!.add(targetId)
+              }
+            } 
+            // Check if target is level 1 and source is a person
+            else if (targetId === level1Id && sourceId !== selectedNode.id) {
+              const sourceNode = graphData.nodes.find(n => n.id === sourceId)
+              if (sourceNode && sourceNode.type === 'person') {
+                focusedNodeIds!.add(sourceId)
+              }
+            }
+          })
+        })
+      }
+      
+      // Step 1: Filter nodes by type, search, and focus
       let filteredNodes = graphData.nodes.filter((node) => {
         // Filter by node type
         if (!nodeFilters[node.type]) return false
+        
+        // If a company is focused, only show focused nodes
+        if (focusedNodeIds && !focusedNodeIds.has(node.id)) return false
         
         // Filter by search term
         if (searchTerm) {
@@ -105,8 +162,8 @@ export default function CompanyRelationshipGraph({
       // IMPORTANT: Handle both string IDs and object references (in case graph library transforms them)
       const filteredLinks = graphData.links.filter((link) => {
         // Extract source and target IDs - handle both string and object formats
-        const sourceId = typeof link.source === 'string' ? link.source : (link.source as any)?.id || link.source
-        const targetId = typeof link.target === 'string' ? link.target : (link.target as any)?.id || link.target
+        const sourceId = getNodeId(link.source)
+        const targetId = getNodeId(link.target)
         
         // First verify that both nodes actually exist in the graph data
         const sourceNodeExists = graphData.nodes.some(n => n.id === sourceId)
@@ -215,8 +272,8 @@ export default function CompanyRelationshipGraph({
     // Handle both string IDs and object references
     const linkedNodeIds = new Set<string>()
     filteredLinks.forEach((link) => {
-      const sourceId = typeof link.source === 'string' ? link.source : (link.source as any)?.id || link.source
-      const targetId = typeof link.target === 'string' ? link.target : (link.target as any)?.id || link.target
+      const sourceId = getNodeId(link.source)
+      const targetId = getNodeId(link.target)
       linkedNodeIds.add(sourceId)
       linkedNodeIds.add(targetId)
     })
@@ -225,8 +282,8 @@ export default function CompanyRelationshipGraph({
     // Handle both string IDs and object references
     const originalLinkedNodeIds = new Set<string>()
     graphData.links.forEach((link) => {
-      const sourceId = typeof link.source === 'string' ? link.source : (link.source as any)?.id || link.source
-      const targetId = typeof link.target === 'string' ? link.target : (link.target as any)?.id || link.target
+      const sourceId = getNodeId(link.source)
+      const targetId = getNodeId(link.target)
       // Only consider links where both nodes are in the filtered set
       if (visibleNodeIds.has(sourceId) && visibleNodeIds.has(targetId)) {
         originalLinkedNodeIds.add(sourceId)
@@ -258,10 +315,15 @@ export default function CompanyRelationshipGraph({
       nodes: filteredNodes,
       links: filteredLinks,
     }
-  }, [graphData, nodeFilters, linkFilters, searchTerm])
+  }, [graphData, nodeFilters, linkFilters, searchTerm, selectedNode])
 
   // Node styling based on type
   const getNodeColor = useCallback((node: GraphNode): string => {
+    // Check if person is a CEO (red circular background)
+    if (node.type === 'person' && node.metadata?.isCEO) {
+      return '#ff0000' // red for CEOs
+    }
+    
     switch (node.type) {
       case 'company':
         return '#00ffff' // cyan
@@ -322,18 +384,18 @@ export default function CompanyRelationshipGraph({
     return 1.5
   }, [])
 
-  // Handle node click
+  // Handle node click - select node and show details
   const handleNodeClick = useCallback(
     (node: any) => {
       const graphNode = node as GraphNode
-      if (graphNode.type === 'company' && graphNode.slug) {
-        router.push(`/companies/${graphNode.slug}`)
-      } else if (graphNode.type === 'person' && graphNode.slug) {
-        // Future: navigate to person detail page
-        // router.push(`/people/${graphNode.slug}`)
+      // If clicking the same node, deselect it
+      if (selectedNode?.id === graphNode.id) {
+        setSelectedNode(null)
+      } else {
+        setSelectedNode(graphNode)
       }
     },
-    [router]
+    [selectedNode]
   )
 
   // Handle node hover
@@ -398,9 +460,7 @@ export default function CompanyRelationshipGraph({
         img.onload = () => {
           cacheEntry.loaded = true
           // Force graph re-render to show loaded images
-          if (graphRef.current) {
-            graphRef.current.refresh()
-          }
+          setImageLoadTrigger(prev => prev + 1)
         }
         
         img.onerror = () => {
@@ -526,6 +586,7 @@ export default function CompanyRelationshipGraph({
             }
           }}
           backgroundColor="rgba(0, 0, 0, 0)"
+          // Force re-render when images load (using imageLoadTrigger in dependency)
           // Custom node rendering
           nodeCanvasObject={(node: any, ctx: CanvasRenderingContext2D, globalScale: number) => {
             const graphNode = node as GraphNode
@@ -615,12 +676,19 @@ export default function CompanyRelationshipGraph({
               ctx.stroke()
             } else {
               // Circle for people
+              const isCEO = graphNode.metadata?.isCEO === true
               ctx.arc(node.x, node.y, size, 0, 2 * Math.PI)
               
-              // Draw background fill if no image
-              if (!imageReady) {
-                ctx.fillStyle = getNodeColor(graphNode) + '80' // Add transparency
-                ctx.fill()
+              // Draw background fill - red for CEOs, colored for others
+              if (!imageReady || isCEO) {
+                if (isCEO) {
+                  // Red circular background for CEOs
+                  ctx.fillStyle = '#ff0000' // Red
+                  ctx.fill()
+                } else {
+                  ctx.fillStyle = getNodeColor(graphNode) + '80' // Add transparency
+                  ctx.fill()
+                }
               }
               
               ctx.strokeStyle = getNodeColor(graphNode)
@@ -696,7 +764,7 @@ export default function CompanyRelationshipGraph({
         />
 
         {/* Hover Tooltip */}
-        {(hoveredNode || hoveredLink) && (
+        {(hoveredNode || hoveredLink) && !selectedNode && (
           <div className="absolute top-4 right-4 bg-cyber-dark border border-cyber-cyan/50 rounded-sm p-3 max-w-xs z-10 cyber-border terminal-glow">
             {hoveredNode && (
               <div>
@@ -706,11 +774,9 @@ export default function CompanyRelationshipGraph({
                 <div className="text-cyber-cyan/60 text-xs font-mono uppercase">
                   {hoveredNode.type}
                 </div>
-                {hoveredNode.slug && (
-                  <div className="text-cyber-cyan/40 text-xs font-mono mt-1">
-                    Click to view details
-                  </div>
-                )}
+                <div className="text-cyber-cyan/40 text-xs font-mono mt-1">
+                  Click for details
+                </div>
               </div>
             )}
             {hoveredLink && (
@@ -733,6 +799,164 @@ export default function CompanyRelationshipGraph({
           </div>
         )}
 
+        {/* Selected Node Details Panel */}
+        {selectedNode && (
+          <div className="absolute top-4 right-4 bg-cyber-dark border border-cyber-cyan/50 rounded-sm p-4 max-w-sm z-20 cyber-border terminal-glow shadow-lg">
+            <div className="flex items-start justify-between mb-3">
+              <div className="flex-1">
+                <div className="text-cyber-cyan font-bold font-mono text-lg mb-1">
+                  &gt; {selectedNode.name}
+                </div>
+                <div className="text-cyber-cyan/60 text-xs font-mono uppercase">
+                  {selectedNode.type}
+                </div>
+              </div>
+              <button
+                onClick={() => setSelectedNode(null)}
+                className="text-cyber-cyan/60 hover:text-cyber-cyan font-mono text-xl leading-none"
+                aria-label="Close details"
+              >
+                ×
+              </button>
+            </div>
+
+            {/* Node-specific details */}
+            {selectedNode.type === 'company' && (
+              <div className="space-y-2 text-xs font-mono">
+                <div className="px-2 py-1.5 bg-cyber-cyan/10 border border-cyber-cyan/40 rounded-sm text-cyber-cyan/80 mb-2">
+                  <div className="font-bold mb-1">FOCUSED VIEW</div>
+                  <div className="text-xs">Direct connections + people 1 level out</div>
+                </div>
+                {selectedNode.logoUrl && (
+                  <div className="mb-2">
+                    <img
+                      src={selectedNode.logoUrl}
+                      alt={`${selectedNode.name} logo`}
+                      className="max-w-full h-auto max-h-16 object-contain"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).style.display = 'none'
+                      }}
+                    />
+                  </div>
+                )}
+                <button
+                  onClick={() => {
+                    const companyPath = selectedNode.slug 
+                      ? `/companies/${selectedNode.slug}`
+                      : `/companies/${selectedNode.id}`
+                    router.push(companyPath)
+                  }}
+                  className="w-full px-3 py-2 bg-cyber-cyan/30 hover:bg-cyber-cyan/40 border-2 border-cyber-cyan/70 hover:border-cyber-cyan rounded-sm text-cyber-cyan font-bold transition-all terminal-glow"
+                >
+                  See More →
+                </button>
+                <button
+                  onClick={() => setSelectedNode(null)}
+                  className="w-full px-3 py-2 bg-cyber-cyan/20 hover:bg-cyber-cyan/30 border border-cyber-cyan/50 rounded-sm text-cyber-cyan transition-colors"
+                >
+                  Clear Focus
+                </button>
+              </div>
+            )}
+
+            {selectedNode.type === 'person' && (
+              <div className="space-y-2 text-xs font-mono">
+                {selectedNode.metadata?.isCEO === true && (
+                  <div className="px-2 py-1 bg-red-500/20 border border-red-500/50 rounded-sm text-red-400">
+                    CEO
+                  </div>
+                )}
+                {selectedNode.photoUrl && (
+                  <div className="mt-2">
+                    <img
+                      src={selectedNode.photoUrl}
+                      alt={`${selectedNode.name}`}
+                      className="w-16 h-16 rounded-full object-cover border-2 border-cyber-cyan/50"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).style.display = 'none'
+                      }}
+                    />
+                  </div>
+                )}
+                {selectedNode.slug && (
+                  <button
+                    onClick={() => router.push(`/people/${selectedNode.slug}`)}
+                    className="w-full mt-2 px-3 py-2 bg-cyber-cyan/20 hover:bg-cyber-cyan/30 border border-cyber-cyan/50 rounded-sm text-cyber-cyan transition-colors"
+                  >
+                    View Full Details →
+                  </button>
+                )}
+                {!selectedNode.slug && (
+                  <div className="text-cyber-cyan/60 mt-2">
+                    ID: {String(selectedNode.metadata?.personId || selectedNode.id)}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {selectedNode.type === 'capital' && (
+              <div className="space-y-2 text-xs font-mono">
+                <div className="text-cyber-cyan/60">
+                  Investment Firm / Capital Entity
+                </div>
+                {selectedNode.logoUrl && (
+                  <div className="mt-2">
+                    <img
+                      src={selectedNode.logoUrl}
+                      alt={`${selectedNode.name} logo`}
+                      className="max-w-full h-auto max-h-16 object-contain"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).style.display = 'none'
+                      }}
+                    />
+                  </div>
+                )}
+                {selectedNode.slug && (
+                  <button
+                    onClick={() => {
+                      if (selectedNode.metadata?.companyId) {
+                        // If it's actually a company, navigate to company page
+                        router.push(`/companies/${selectedNode.slug}`)
+                      }
+                    }}
+                    className="w-full mt-2 px-3 py-2 bg-cyber-cyan/20 hover:bg-cyber-cyan/30 border border-cyber-cyan/50 rounded-sm text-cyber-cyan transition-colors"
+                  >
+                    View Details →
+                  </button>
+                )}
+              </div>
+            )}
+
+            {selectedNode.type === 'data-center' && (
+              <div className="space-y-2 text-xs font-mono">
+                <div className="text-cyber-cyan/60">
+                  Data Center
+                </div>
+                {selectedNode.metadata?.dataCenterId && (
+                  <div className="text-cyber-cyan/60 mt-2">
+                    ID: {selectedNode.metadata.dataCenterId}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Connected nodes count */}
+            <div className="mt-4 pt-3 border-t border-cyber-cyan/20">
+              <div className="text-cyber-cyan/60 text-xs font-mono">
+                Connections: {
+                  filteredGraphData.links.filter(
+                    (link) => {
+                      const sourceId = typeof link.source === 'string' ? link.source : (link.source as any)?.id || link.source
+                      const targetId = typeof link.target === 'string' ? link.target : (link.target as any)?.id || link.target
+                      return sourceId === selectedNode.id || targetId === selectedNode.id
+                    }
+                  ).length
+                }
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Legend */}
         <div className="absolute bottom-4 left-4 bg-cyber-dark/90 border border-cyber-cyan/30 rounded-sm p-3 z-10 cyber-border">
           <div className="text-xs font-bold text-cyber-cyan font-mono uppercase mb-2">Legend</div>
@@ -744,6 +968,10 @@ export default function CompanyRelationshipGraph({
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 rounded-full border-2" style={{ backgroundColor: '#ffd700', borderColor: '#ffd700' }}></div>
               <span className="text-cyber-cyan/80">Person</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full border-2" style={{ backgroundColor: '#ff0000', borderColor: '#ff0000' }}></div>
+              <span className="text-cyber-cyan/80">CEO</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 border-2" style={{ borderColor: '#ff0000', clipPath: 'polygon(50% 0%, 0% 100%, 100% 100%)', backgroundColor: '#ff000080' }}></div>

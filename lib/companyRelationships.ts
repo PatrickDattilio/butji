@@ -28,6 +28,7 @@ export type GraphLinkType =
   | 'subsidiary' // Company → Company (subsidiary)
   | 'board-member' // Person → Company (board position)
   | 'founder' // Person → Company (founded)
+  | 'ceo' // Person → Company (CEO)
   | 'partnership' // Company → Company (partnership)
   | 'data-center-owner' // Company → DataCenter (owns)
   | 'data-center-user' // Company → DataCenter (uses)
@@ -531,7 +532,8 @@ function extractDataCenterRelationships(companies: Company[]): GraphLink[] {
 function buildGraphNodes(
   companies: Company[],
   personMap: Map<string, Person>,
-  dataCenters: Array<{ id: string; title: string }> = []
+  dataCenters: Array<{ id: string; title: string }> = [],
+  ceoPersonIds: Set<string> = new Set()
 ): GraphNode[] {
   const nodes: GraphNode[] = []
   const nodeIds = new Set<string>() // Track node IDs to prevent duplicates
@@ -577,6 +579,8 @@ function buildGraphNodes(
           },
         })
       } else {
+        // Check if this person is a CEO
+        const isCEO = ceoPersonIds.has(personId)
         nodes.push({
           id: personId,
           name: person.name,
@@ -585,6 +589,7 @@ function buildGraphNodes(
           slug: person.slug,
           metadata: {
             personId: personId,
+            isCEO: isCEO,
           },
         })
       }
@@ -953,6 +958,80 @@ export async function buildGraphData(
         }
       }
     }
+    
+    // CEO relationships - match company.ceo to person names
+    if (dbCompany.ceo) {
+      const ceoName = dbCompany.ceo.trim()
+      if (ceoName) {
+        // Try to find this person in the personMap by name matching
+        let ceoPersonId: string | null = null
+        
+        // First, try exact match
+        for (const [personId, person] of personMap.entries()) {
+          if (areSamePerson(person.name, ceoName)) {
+            ceoPersonId = personId
+            break
+          }
+        }
+        
+        // If not found, try to find or create person in database
+        if (!ceoPersonId) {
+          // Check if person exists in database
+          const normalizedCeoName = normalizePersonName(ceoName)
+          const existingPersonId = personNameToId.get(normalizedCeoName)
+          
+          if (existingPersonId && personMap.has(existingPersonId)) {
+            ceoPersonId = existingPersonId
+          } else {
+            // Try to find person in database by name
+            const dbPerson = await prisma.person.findFirst({
+              where: {
+                name: {
+                  equals: ceoName,
+                  mode: 'insensitive',
+                },
+              },
+            })
+            
+            if (dbPerson) {
+              // Check if this person's name is actually a company name - if so, skip it
+              if (!isCompanyName(dbPerson.name, companyNameSet)) {
+                ceoPersonId = dbPerson.id
+                personMap.set(ceoPersonId, {
+                  id: dbPerson.id,
+                  name: dbPerson.name,
+                  slug: dbPerson.slug || undefined,
+                  bio: dbPerson.bio || undefined,
+                  photoUrl: dbPerson.photoUrl || undefined,
+                  linkedinUrl: dbPerson.linkedinUrl || undefined,
+                  wikipediaUrl: dbPerson.wikipediaUrl || undefined,
+                })
+                const normalized = normalizePersonName(dbPerson.name)
+                personNameToId.set(normalized, ceoPersonId)
+              }
+            }
+          }
+        }
+        
+        // If we found the CEO person, create the link
+        if (ceoPersonId) {
+          // Check if link already exists before adding
+          const linkExists = links.some(
+            link => link.source === ceoPersonId && link.target === dbCompany.id && link.type === 'ceo'
+          )
+          
+          if (!linkExists) {
+            links.push({
+              source: ceoPersonId!,
+              target: dbCompany.id,
+              type: 'ceo',
+              strength: 3, // Strong relationship
+              metadata: {},
+            })
+          }
+        }
+      }
+    }
   }
   
   // Fetch any missing investor companies and add them to the companies array
@@ -1006,6 +1085,78 @@ export async function buildGraphData(
   // Only add people/links that aren't already captured by database relationships
   if (includePeople) {
     for (const company of companies) {
+      // Extract CEO relationships - match company.ceo to person names
+      if (company.ceo) {
+        const ceoName = company.ceo.trim()
+        if (ceoName) {
+          // Try to find this person in the personMap by name matching
+          let ceoPersonId: string | null = null
+          
+          // First, try exact match in personMap
+          for (const [personId, person] of personMap.entries()) {
+            if (areSamePerson(person.name, ceoName)) {
+              ceoPersonId = personId
+              break
+            }
+          }
+          
+          // If not found, try to find person in database
+          if (!ceoPersonId) {
+            const normalizedCeoName = normalizePersonName(ceoName)
+            const existingPersonId = personNameToId.get(normalizedCeoName)
+            
+            if (existingPersonId && personMap.has(existingPersonId)) {
+              ceoPersonId = existingPersonId
+            } else {
+              // Try to find person in database by name
+              const dbPerson = await prisma.person.findFirst({
+                where: {
+                  name: {
+                    equals: ceoName,
+                    mode: 'insensitive',
+                  },
+                },
+              })
+              
+              if (dbPerson) {
+                // Check if this person's name is actually a company name - if so, skip it
+                if (!isCompanyName(dbPerson.name, companyNameSet)) {
+                  ceoPersonId = dbPerson.id
+                  personMap.set(ceoPersonId, {
+                    id: dbPerson.id,
+                    name: dbPerson.name,
+                    slug: dbPerson.slug || undefined,
+                    bio: dbPerson.bio || undefined,
+                    photoUrl: dbPerson.photoUrl || undefined,
+                    linkedinUrl: dbPerson.linkedinUrl || undefined,
+                    wikipediaUrl: dbPerson.wikipediaUrl || undefined,
+                  })
+                  const normalized = normalizePersonName(dbPerson.name)
+                  personNameToId.set(normalized, ceoPersonId)
+                }
+              }
+            }
+          }
+          
+          // If we found the CEO person, create the link (if it doesn't already exist)
+          if (ceoPersonId) {
+            const linkExists = links.some(
+              link => link.source === ceoPersonId && link.target === company.id && link.type === 'ceo'
+            )
+            
+            if (!linkExists) {
+              links.push({
+                source: ceoPersonId,
+                target: company.id,
+                type: 'ceo',
+                strength: 3, // Strong relationship
+                metadata: {},
+              })
+            }
+          }
+        }
+      }
+      
       // Extract funding relationships (person investors from JSON)
       // Only create links for people already in personMap (from database) and avoid duplicate links
       const fundingLinks = extractFundingRelationships(company, personMap, personNameToId, companyNameSet)
@@ -1037,8 +1188,17 @@ export async function buildGraphData(
   // Collect data centers
   const dataCenters = companies.flatMap(c => c.dataCenters || [])
   
+  // Collect CEO person IDs from CEO links
+  const ceoPersonIds = new Set<string>()
+  for (const link of links) {
+    if (link.type === 'ceo') {
+      const personId = typeof link.source === 'string' ? link.source : (link.source as any)?.id || link.source
+      ceoPersonIds.add(personId)
+    }
+  }
+  
   // Build nodes (already deduplicated in buildGraphNodes)
-  const nodes = buildGraphNodes(companies, personMap, dataCenters)
+  const nodes = buildGraphNodes(companies, personMap, dataCenters, ceoPersonIds)
   
   // Final deduplication: Remove duplicate links
   const uniqueLinks: GraphLink[] = []
