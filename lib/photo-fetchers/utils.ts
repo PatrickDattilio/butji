@@ -172,7 +172,10 @@ export function extractImagesFromHTML(html: string, personName: string, baseUrl?
   for (const pattern of patterns) {
     let match
     while ((match = pattern.regex.exec(html)) !== null) {
-      const result = pattern.extractImage(match[0], ...(match.slice(1) as [string, ...string[]]))
+      // Call extractImage with appropriate arguments based on match length
+      // Use apply to handle variable number of arguments safely
+      const result = (pattern.extractImage as any).apply(null, match.slice(0, match.length))
+      
       if (result) {
         // Normalize URL
         let url = result.url
